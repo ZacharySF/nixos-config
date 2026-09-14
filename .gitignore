@@ -1,0 +1,14 @@
+# nix build symlinks
+result
+result-*
+
+# direnv
+.direnv/
+
+# editor noise
+.vscode/
+*.swp
+
+# never commit VM images / disk images
+*.qcow2
+*.img

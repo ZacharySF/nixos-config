@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports =
@@ -13,7 +13,7 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
+  virtualisation.docker.enable = true;
   networking.hostName = "xelo-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -34,7 +34,7 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
+  # services.xserver.displayManager.gdm.enable = true; # removed: conflicts with greetd
   services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
@@ -70,12 +70,19 @@
   users.users.xelo = {
     isNormalUser = true;
     description = "xelo";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
     #  thunderbird
     ];
   };
 
+  users.users.aibox = {
+    isNormalUser = true;
+    description = "AI Sandbox";
+    home = "/home/aibox";
+    shell = pkgs.bash;
+    extraGroups = [ "networkmanager" "docker" ];
+  };
   # Install firefox.
   programs.firefox.enable = true;
 
@@ -96,15 +103,12 @@
     };
   };
 
-  #  WAYBAR
-  programs.waybar.enable = true;
-  
-  fonts.packages = with pkgs;  [
-  	nerd-fonts.symbols-only
+  fonts.packages = with pkgs; [
+    nerd-fonts.symbols-only
+    nerd-fonts.jetbrains-mono
   ];
-  #  services.blueman.enable = true;
-  
-    # Ensure PipeWire is set up for Bluetooth audio
+  # services.blueman.enable = true;
+
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
@@ -116,7 +120,11 @@
      fuzzel
      btop
      bzmenu
+     mako
      swaybg
+     wl-clipboard
+     nodejs_22
+     chromium
   ];
 
   programs.amnezia-vpn.enable = true;
@@ -136,7 +144,7 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
+  programs.nix-ld.enable = true;
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
@@ -151,7 +159,7 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
   # Enable the Niri compositor
-    programs.niri.enable = true;
+  programs.niri.enable = true;
   # Enable Greetd to auto-start Niri
   services.greetd = {
     enable = true;
@@ -162,5 +170,9 @@
       };
     };
   };
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.registry.nixpkgs.flake = inputs.nixpkgs;
+  nix.nixPath = [ "nixpkgs=${inputs.nixpkgs}" ];
 }

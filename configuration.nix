@@ -34,8 +34,8 @@
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -73,10 +73,12 @@
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
     #  thunderbird
+    libreoffice
     ];
   };
 
-  user.users.aibox = {
+
+  users.users.aibox = {
   	isNormalUser = true;
   	description = "AI Sandbox";
   	home = "/home/aibox";
@@ -104,13 +106,13 @@
     };
   };
 
-  
+
   fonts.packages = with pkgs;  [
   	nerd-fonts.symbols-only
   	nerd-fonts.jetbrains-mono
   ];
   #  services.blueman.enable = true;
-  
+
     # Ensure PipeWire is set up for Bluetooth audio
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
@@ -129,20 +131,17 @@
      nodejs_22
      obsidian
      discord
+     vscode
+     claude-code
      chromium
-     vscode     
+     codex
+     bun
   ];
-  
-  programs.amnezia-vpn.enable = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest; 
 
-  programs = {
-  	chromium = {
-  		enabled = true;
-  		package = pkgs.chromium;
-  	};
-  };
-   
+  programs.amnezia-vpn.enable = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+
   hardware.enableAllFirmware = true;
   hardware.firmware = [ pkgs.sof-firmware ];
   # Some programs need SUID wrappers, can be configured further or are
@@ -178,7 +177,7 @@
     settings = {
       default_session = {
         command = "${pkgs.niri}/bin/niri-session";
-        user = "xelo"; 
+        user = "xelo";
       };
     };
   };
