@@ -25,6 +25,7 @@ in
     # AI coding assistants
     # ---------------------------------------------------------------
     codex             # OpenAI Codex CLI
+    claude-code       # Claude Code CLI
 
     # ---------------------------------------------------------------
     # General development

@@ -33,6 +33,7 @@
 
   # Firefox system-wide (so it works regardless of the user environment state).
   programs.firefox.enable = true;
+  programs.chromium.enable = true;
 
   # GTK / GNOME app support without the full desktop:
   programs.dconf.enable = true;                 # GTK apps store settings here
