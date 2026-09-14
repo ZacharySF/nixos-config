@@ -35,6 +35,7 @@
 
   # A couple of GUI utilities that belong to "the desktop" rather than dev work.
   home.packages = with pkgs; [
+    chromium       # web browser
     nautilus       # file manager
     pavucontrol    # audio mixer
     wl-clipboard
