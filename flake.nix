@@ -1,5 +1,5 @@
 {
-  description = "xelo's NixOS configuration — single host: xelo-nixos (Intel laptop, Niri/Wayland)";
+  description = "xelo's NixOS configuration — external and internal drive hosts (Intel laptop, Niri/Wayland)";
 
   inputs = {
     # nixpkgs — the package set. `nixos-unstable` is a rolling branch that is
@@ -24,10 +24,7 @@
     { self, nixpkgs, home-manager, spicetify-nix, ... }@inputs:
     let
       system = "x86_64-linux";
-    in
-    {
-      # `sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos`
-      nixosConfigurations.xelo-nixos = nixpkgs.lib.nixosSystem {
+      mkHost = host: nixpkgs.lib.nixosSystem {
         inherit system;
 
         # Makes `inputs` available to every module via its argument set.
@@ -35,7 +32,7 @@
 
         modules = [
           # ---- The machine ----
-          ./hosts/xelo-nixos
+          host
 
           # ---- home-manager wired in as a NixOS module ----
           # This means ONE command (`nixos-rebuild switch`) builds both the
@@ -50,6 +47,13 @@
             home-manager.sharedModules = [ spicetify-nix.homeManagerModules.default ];
           }
         ];
+      };
+
+    in
+    {
+      nixosConfigurations = {
+        xelo-nixos = mkHost ./hosts/xelo-nixos;
+        xelo-nixos-main = mkHost ./hosts/xelo-nixos-main;
       };
 
       # `nix fmt` formats every .nix file in the repo.

@@ -1,6 +1,6 @@
 # nixos-config
 
-Declarative configuration for a single NixOS machine (`xelo-nixos`), built as a
+Declarative configuration for the external (`xelo-nixos`) and internal (`xelo-nixos-main`) NixOS installations, built as a
 **Nix flake** with **home-manager** wired in as a NixOS module.
 
 One command builds the whole thing — system + user environment:
@@ -188,17 +188,20 @@ sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos
 Then repeat the "one-time per-user bits" from section 6, and restore anything
 that is deliberately outside version control (next section).
 
-### If you want to keep BOTH machines in this repo
+### Internal drive alongside Windows
 
-This repo is single-host to stay simple. To go multi-host later:
+`hosts/xelo-nixos-main` preserves the internal installation's filesystem UUIDs,
+Intel NPU support, and `xelo` UID 1001. It uses only internal swap. Both hosts
+share the desktop and wallpaper. On the internal installation use:
 
-1. `cp -r hosts/xelo-nixos hosts/<new-name>`
-2. put the new machine's `hardware-configuration.nix` in it, set its
-   `networking.hostName`
-3. in `flake.nix`, duplicate the `nixosConfigurations.xelo-nixos = …` block as
-   `nixosConfigurations.<new-name> = …` pointing at `./hosts/<new-name>`
-4. move any host-specific settings out of `modules/system/` into the relevant
-   `hosts/*/default.nix`
+```sh
+sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos-main
+```
+
+Its shell aliases select this host automatically. The shared Windows ESP has a
+five-second systemd-boot menu with at most two NixOS generations. Firmware boot
+order is preserved. Choose the internal WD drive in the firmware boot menu;
+systemd-boot detects Windows Boot Manager on the same ESP.
 
 ---
 
@@ -239,6 +242,5 @@ installed at both original wallpaper paths. The root `configuration.nix` and
 `.dotfiles/` and `legacy/home/` preserve the older configuration for reference; use the root flake
 for builds and updates.
 
-The `xelo-nixos` host currently describes the external drive. Do not use its
-filesystem UUIDs for the internal drive: preserve the internal installation's
-hardware configuration before rebuilding there.
+The `xelo-nixos` host describes the external drive; `xelo-nixos-main` describes
+the internal drive. Always select the host matching the installation.
