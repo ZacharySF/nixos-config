@@ -34,7 +34,7 @@
     {
       "type": "script",
       "cmd": "/home/xelo/.local/bin/battery-icon.sh",
-      "interval": 30
+      "interval": 30000
     },
     {
       "type": "clock",

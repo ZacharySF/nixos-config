@@ -11,6 +11,11 @@
 {
   xdg.configFile."niri/config.kdl".source = ./config.kdl;
 
+  # Without a config, mako's default-timeout is 0 (never expire), so
+  # notifications like niri's "Screenshot captured" sit on screen until
+  # clicked. Give them a real timeout.
+  xdg.configFile."mako/config".source = ./mako.conf;
+
   home.packages = with pkgs; [
     swaybg          # wallpaper (spawned at startup — see config.kdl)
     mako            # notification daemon

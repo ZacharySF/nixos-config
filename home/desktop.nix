@@ -2,6 +2,22 @@
 # GTK theme, cursor theme, XDG user directories.
 { pkgs, ... }:
 {
+  # Firefox is installed system-wide (modules/system/desktop.nix); this just
+  # manages profile prefs. Site isolation (Fission) spawns a fresh content
+  # process pretty liberally by default — cap the pool so it reuses processes
+  # across same-site tabs instead of growing unbounded. Cross-origin isolation
+  # is unaffected.
+  programs.firefox = {
+    enable = true;
+    profiles.default = {
+      isDefault = true;
+      settings = {
+        "dom.ipc.processCount" = 4;
+        "browser.tabs.unloadOnLowMemory" = true;
+      };
+    };
+  };
+
   # Consistent dark GTK look for nautilus, pavucontrol, etc.
   gtk = {
     enable = true;

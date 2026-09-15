@@ -8,15 +8,12 @@
   # Installs Niri and registers a `niri` / `niri-session` and a desktop entry.
   programs.niri.enable = true;
 
-  # greetd: minimal login manager. Here it is configured to launch a Niri
-  # session for `xelo` directly — effectively autologin into Niri on boot.
-  # To get a real login prompt instead, replace `default_session.command`
-  # with a greeter like `${pkgs.greetd.tuigreet}/bin/tuigreet --cmd niri-session`.
+  # greetd: minimal login manager. tuigreet prompts for a username/password
+  # and then launches a Niri session on successful auth.
   services.greetd = {
     enable = true;
     settings.default_session = {
-      command = "${pkgs.niri}/bin/niri-session";
-      user = "xelo";
+      command = "${pkgs.tuigreet}/bin/tuigreet --cmd niri-session";
     };
   };
 
@@ -30,6 +27,16 @@
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
+  # Pin the portal backend explicitly. Without this, xdg-desktop-portal-gnome
+  # (pulled in transitively, not asked for anywhere in this config — there is
+  # no GNOME session here) gets dbus-activated alongside the gtk portal we
+  # actually want, running two portal implementations for no reason.
+  xdg.portal.config.common.default = [ "gtk" ];
+
+  # speech-dispatcher gets dbus-activated by something in the GTK/a11y stack
+  # even though nothing here uses a screen reader. Mask it; if you ever wire
+  # up accessibility/TTS, flip this back.
+  systemd.user.services.speech-dispatcher.enable = false;
 
   # Firefox system-wide (so it works regardless of the user environment state).
   programs.firefox.enable = true;
