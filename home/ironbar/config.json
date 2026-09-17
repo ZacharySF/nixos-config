@@ -20,6 +20,14 @@
       "type": "bluetooth"
     }
   ],
+  "center": [
+    {
+      "type": "script",
+      "name": "focused-app",
+      "cmd": "/home/xelo/.local/bin/ironbar-focused-app",
+      "mode": "watch"
+    }
+  ],
   "end": [
     {
       "type": "volume",

@@ -10,6 +10,13 @@
   xdg.configFile."ironbar/config.json".source = ./ironbar/config.json;
   xdg.configFile."ironbar/style.css".source = ./ironbar/style.css;
 
+  home.file.".local/bin/ironbar-focused-app" = {
+    source = pkgs.writeScript "ironbar-focused-app" (
+      "#!${pkgs.python3}/bin/python3\n" + builtins.readFile ./ironbar/focused-app.py
+    );
+    executable = true;
+  };
+
   # config.json runs this via an absolute path (~/.local/bin/battery-icon.sh).
   home.file.".local/bin/battery-icon.sh" = {
     source = ./ironbar/battery-icon.sh;

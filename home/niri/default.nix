@@ -11,6 +11,9 @@
 {
   xdg.configFile."niri/config.kdl".source = ./config.kdl;
 
+  # Dark launcher with the same blue border as Niri's active focus ring.
+  xdg.configFile."fuzzel/fuzzel.ini".source = ./fuzzel.ini;
+
   # Without a config, mako's default-timeout is 0 (never expire), so
   # notifications like niri's "Screenshot captured" sit on screen until
   # clicked. Give them a real timeout.
@@ -19,6 +22,7 @@
   home.packages = with pkgs; [
     swaybg          # wallpaper (spawned at startup — see config.kdl)
     mako            # notification daemon
+    libnotify       # notify-send — used by Claude Code / Codex hooks for desktop popups
     fuzzel          # application launcher (Mod+D)
     bzmenu          # bluetooth TUI menu (Mod+B)
     swaylock        # screen locker (Super+Alt+L)

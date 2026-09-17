@@ -12,3 +12,7 @@ result-*
 # never commit VM images / disk images
 *.qcow2
 *.img
+
+# machine-specific hardware identifiers (MAC addresses, etc) — see
+# modules/system/local-hardware.example.nix for the template
+modules/system/local-hardware.nix

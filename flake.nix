@@ -18,6 +18,10 @@
     # spicetify-nix — declarative Spotify (spicetify) theming.
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     spicetify-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # hermes-agent — Nous Research's AI agent CLI (github:NousResearch/hermes-agent).
+    hermes-agent.url = "github:NousResearch/hermes-agent";
+    hermes-agent.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

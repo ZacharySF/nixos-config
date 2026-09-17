@@ -9,6 +9,10 @@
 
 prefer-no-csd
 input {
+    touch {
+        off
+    }
+
     keyboard {
 
         repeat-rate 35
@@ -324,14 +328,13 @@ animations {
 // Find more information on the wiki:
 // https://yalter.github.io/niri/Configuration:-Window-Rules
 
-// Work around WezTerm's initial configure bug
-// by setting an empty default-column-width.
+// Work around WezTerm's initial configure bug and open it at half width.
 window-rule {
     // This regular expression is intentionally made as specific as possible,
     // since this is the default config, and we want no false positives.
     // You can get away with just app-id="wezterm" if you want.
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
+    default-column-width { proportion 0.5; }
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
@@ -355,10 +358,9 @@ window-rule {
     // block-out-from "screencast"
 }
 
-// Example: enable rounded corners for all windows.
-// (This example rule is commented out with a "/-" in front.)
-/-window-rule {
-    geometry-corner-radius 12
+// Give windows rounded corners and clip their contents to the rounded shape.
+window-rule {
+    geometry-corner-radius 8
     clip-to-geometry true
 }
 
@@ -370,7 +372,7 @@ binds {
     Mod+B { spawn "bzmenu" "-l" "fuzzel"; }
     Mod+D { spawn "fuzzel"; }
     Mod+T { spawn "firefox"; }
-    Mod+Return hotkey-overlay-title="Open a Terminal: foot" { spawn "foot"; }
+    Mod+Return hotkey-overlay-title="Open a Terminal: wezterm" { spawn "wezterm"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
@@ -408,8 +410,8 @@ binds {
     Mod+W repeat=false { close-window; }
 
     Mod+Left  { focus-column-left; }
-    Mod+Down  { focus-window-down; }
-    Mod+Up    { focus-window-up; }
+    Mod+Down  { move-window-down-or-to-workspace-down; }
+    Mod+Up    { move-window-up-or-to-workspace-up; }
     Mod+Right { focus-column-right; }
     Mod+H     { focus-column-left; }
     Mod+J     { focus-window-down; }
@@ -417,8 +419,8 @@ binds {
     Mod+L     { focus-column-right; }
 
     Mod+Ctrl+Left  { move-column-left; }
-    Mod+Ctrl+Down  { move-window-down; }
-    Mod+Ctrl+Up    { move-window-up; }
+    Mod+Ctrl+Down  { focus-window-or-workspace-down; }
+    Mod+Ctrl+Up    { focus-window-or-workspace-up; }
     Mod+Ctrl+Right { move-column-right; }
     Mod+Ctrl+H     { move-column-left; }
     Mod+Ctrl+J     { move-window-down; }

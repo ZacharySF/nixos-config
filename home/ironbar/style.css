@@ -43,3 +43,11 @@ window {
   min-width: 0;
   min-height: 0;
 }
+
+#focused-app {
+  color: #91a2ff;
+  background-color: rgba(26, 27, 38, 0.85);
+  border-radius: 8px;
+  padding: 0px 10px;
+  font-weight: 600;
+}

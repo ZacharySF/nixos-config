@@ -10,11 +10,15 @@
     ./niri           # Niri config file + session helper tools
     ./desktop.nix    # GTK theme, cursor, xdg user dirs
     ./foot.nix       # terminal emulator
+    ./wezterm.nix    # WezTerm appearance
     ./ironbar.nix    # status bar
     ./btop.nix       # system monitor config
     ./editors.nix    # zed / vscode / obsidian
     ./dev.nix        # quant + computer-architecture toolchain
+    ./ece.nix        # ECE coursework: math, circuit sim, HDL/FPGA, embedded, lab instruments
     ./spicetify.nix  # Spotify theming
+    ./codex-notify.nix # desktop notification script for Codex CLI turn-complete
+    ./hermes.nix     # hermes-agent CLI (Nous Research AI agent)
   ];
 
   home.username = "xelo";

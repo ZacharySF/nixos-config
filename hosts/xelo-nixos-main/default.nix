@@ -6,6 +6,14 @@
   system.stateVersion = "25.11";
   users.users.xelo.uid = 1001;
 
+  # Prefer compressed RAM swap, with the existing disk swap as fallback.
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+    priority = 100;
+  };
+
   # Shared 384 MiB Windows ESP. Preserve firmware boot order and show the menu.
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
   boot.loader.systemd-boot.configurationLimit = lib.mkForce 2;

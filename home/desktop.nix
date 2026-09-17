@@ -54,6 +54,7 @@
     chromium       # web browser
     nautilus       # file manager
     pavucontrol    # audio mixer
+    wezterm       # terminal emulator
     wl-clipboard
   ];
 }
