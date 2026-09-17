@@ -3,7 +3,7 @@
 Declarative configuration for the external (`xelo-nixos`) and internal (`xelo-nixos-main`) NixOS installations, built as a
 **Nix flake** with **home-manager** wired in as a NixOS module.
 
-One command builds the whole thing — system + user environment:
+system + user enviornment
 
 ```sh
 sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos
@@ -15,13 +15,11 @@ sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos
 
 The old setup had four half-finished copies of the config in `~/.dotfiles`,
 `/etc/nixos`, `/etc/nixos/.dotfiles`, and a separate standalone home-manager in
-`~/.config/home-manager`. `/etc/nixos/configuration.nix` had syntax errors and
-would not build. This repo replaces all of that with **one source of truth** you
-can read top-to-bottom and push to GitHub.
-
+`~/.config/home-manager`. `/etc/nixos/configuration.nix` had  errors and
+would not build. 
 Design rules:
 
-- **Flake** → inputs (nixpkgs, home-manager, …) are pinned in `flake.lock`, so
+- **Flake** → inputs are pinned in `flake.lock`, so
   the machine is reproducible and moving to a new laptop is a `git clone` + one
   command.
 - **home-manager as a NixOS module** → no separate `home-manager switch`; the
