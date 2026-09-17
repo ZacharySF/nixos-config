@@ -26,9 +26,6 @@ Design rules:
   system rebuild does everything.
 - **Split by topic, not by giant file** → every file is short and owns one
   concern.
-- **Nothing secret in the repo** → no passwords, no SSH keys, no tokens, no VPN
-  credentials. The only personal data is your name + email in `home/git.nix`
-  (already public on your commits).
 
 ---
 
