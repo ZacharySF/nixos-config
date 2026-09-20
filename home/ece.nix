@@ -1,6 +1,10 @@
 # ECE coursework stack: math, circuit simulation, HDL/FPGA, embedded
 # development, lab instruments, and one combined scientific Python 3.13
-# environment (cocotb upstream does not support Python 3.14+ yet).
+# environment (cocotb upstream does not support Python 3.14+ yet). This also
+# carries the quant-finance packages (pandas, polars, scikit-learn, ipython)
+# that used to live in dev.nix's own pythonForQuant -- only one full
+# python3.withPackages closure can live in home.packages at once without
+# colliding on shared paths (bin/pydoc3, share/gdb/*), so it was merged here.
 #
 # verilator, yosys, gtkwave stay out of this list — already in dev.nix.
 #
@@ -65,7 +69,25 @@
         sympy
         matplotlib
         control
-        scikit-rf
+
+        # Quant finance (moved from dev.nix's pythonForQuant)
+        pandas
+        polars
+        scikit-learn
+        ipython
+
+        # Two upstream/nixpkgs bugs on this snapshot, neither ours to fix:
+        # 1. skrf's test suite fails because numpy now raises ComplexWarning
+        #    as an error where skrf's eigendecomposition code
+        #    (mathFunctions.py) discards an imaginary part into a real
+        #    array -- skip the check phase.
+        # 2. nixpkgs' derivation is missing typing-extensions, which skrf's
+        #    own METADATA declares as a runtime dependency, tripping
+        #    pythonRuntimeDepsCheckHook -- add it back.
+        (scikit-rf.overridePythonAttrs (old: {
+          doCheck = false;
+          dependencies = old.dependencies ++ [ typing-extensions ];
+        }))
 
         # HDL verification
         cocotb

@@ -31,6 +31,10 @@
     };
   };
 
+  # Nautilus and other GTK4/libadwaita apps ignore gtk.theme above and
+  # instead follow this toggle for their light/dark variant.
+  dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+
   # Cursor theme (also exported to the Wayland/XCURSOR env).
   home.pointerCursor = {
     enable = true;
@@ -56,5 +60,6 @@
     pavucontrol    # audio mixer
     wezterm       # terminal emulator
     wl-clipboard
+    libreoffice    # opens .docx/.doc/.odt/.xlsx/.pptx and more
   ];
 }

@@ -2,6 +2,7 @@ local wezterm = require "wezterm"
 local config = {}
 
 config.enable_tab_bar = false
+config.window_close_confirmation = "NeverPrompt"
 config.font = wezterm.font "JetBrainsMono Nerd Font"
 config.font_size = 11.0
 -- Leave room for Fastfetch before Niri applies the final tiled window size.

@@ -19,6 +19,7 @@
     ./spicetify.nix  # Spotify theming
     ./codex-notify.nix # desktop notification script for Codex CLI turn-complete
     ./hermes.nix     # hermes-agent CLI (Nous Research AI agent)
+    ./omp.nix        # oh-my-pi (omp) coding agent CLI
   ];
 
   home.username = "xelo";

@@ -281,6 +281,7 @@ layout {
 spawn-at-startup "swaybg" "-i" "/home/xelo/Pictures/wallpaper.jpg" "-m" "fill"
 spawn-at-startup "sh" "-c" "IRONBAR_CSS=~/.config/ironbar/style.css ironbar"
 spawn-at-startup "mako"
+spawn-at-startup "blueman-applet"
 layer-rule {
 	match namespace="^swaybg$"
 	place-within-backdrop true
@@ -370,7 +371,7 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+B { spawn "bzmenu" "-l" "fuzzel"; }
-    Mod+D { spawn "fuzzel"; }
+    Mod+Tab { spawn "fuzzel"; }
     Mod+T { spawn "firefox"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: wezterm" { spawn "wezterm"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
@@ -409,19 +410,19 @@ binds {
 
     Mod+W repeat=false { close-window; }
 
-    Mod+Left  { focus-column-left; }
+    Mod+Left  { move-column-left; }
     Mod+Down  { move-window-down-or-to-workspace-down; }
     Mod+Up    { move-window-up-or-to-workspace-up; }
-    Mod+Right { focus-column-right; }
+    Mod+Right { move-column-right; }
     Mod+H     { focus-column-left; }
     Mod+J     { focus-window-down; }
     Mod+K     { focus-window-up; }
     Mod+L     { focus-column-right; }
 
-    Mod+Ctrl+Left  { move-column-left; }
+    Mod+Ctrl+Left  { focus-column-left; }
     Mod+Ctrl+Down  { focus-window-or-workspace-down; }
     Mod+Ctrl+Up    { focus-window-or-workspace-up; }
-    Mod+Ctrl+Right { move-column-right; }
+    Mod+Ctrl+Right { focus-column-right; }
     Mod+Ctrl+H     { move-column-left; }
     Mod+Ctrl+J     { move-window-down; }
     Mod+Ctrl+K     { move-window-up; }

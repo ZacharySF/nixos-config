@@ -51,3 +51,13 @@ window {
   padding: 0px 10px;
   font-weight: 600;
 }
+
+/* Popup windows (bluetooth, volume, etc.) fall back to the GTK theme's
+   light background otherwise — force them dark, keep the inherited text
+   color from the `*` rule above. */
+popover, popover contents, popover > *,
+.popup, .popup-bluetooth, .popup-volume {
+  background-color: #000000;
+  background-image: none;
+  border-radius: 8px;
+}

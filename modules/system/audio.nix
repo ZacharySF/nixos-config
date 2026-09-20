@@ -25,15 +25,24 @@ in
       # unexpectedly"), which drops the sink to muted/non-default until it's
       # manually fixed. Force SBC-XQ (high quality, no AAC's glitches) instead.
       #
+      # Also disable AVRCP "hardware" volume: PipeWire's default is to forward
+      # volume-slider changes to the device over AVRCP instead of applying
+      # software gain, assuming the device will honor them. AirPods accept the
+      # AVRCP command but don't actually change their output level from it on
+      # Linux, so the volume slider/keys visibly move but nothing is audible
+      # except mute. Setting hw-volume to an empty list forces WirePlumber to
+      # always apply the gain itself instead of delegating to the device.
+      #
       # This has to be `monitor.bluez.properties` (applied once, globally, when
       # the bluez5 backend registers its local A2DP codec endpoints with BlueZ)
-      # rather than a per-device `monitor.bluez.rules` match: codec endpoint
-      # registration isn't a per-device runtime property, so a rules-based
+      # rather than a per-device `monitor.bluez.rules` match: this is endpoint
+      # registration, not a per-device runtime property, so a rules-based
       # update-props on an already-connected device is silently a no-op — it
-      # updates the metadata but doesn't stop AAC from being offered/chosen.
+      # updates the metadata but doesn't change how the endpoint was registered.
       "monitor.bluez.properties" = {
         "bluez5.codecs" = [ "sbc_xq" "sbc" ];
         "bluez5.enable-sbc-xq" = true;
+        "bluez5.hw-volume" = [ ];
       };
     };
   };

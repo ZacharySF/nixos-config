@@ -23,7 +23,7 @@
     swaybg          # wallpaper (spawned at startup — see config.kdl)
     mako            # notification daemon
     libnotify       # notify-send — used by Claude Code / Codex hooks for desktop popups
-    fuzzel          # application launcher (Mod+D)
+    fuzzel          # application launcher (Mod+Tab)
     bzmenu          # bluetooth TUI menu (Mod+B)
     swaylock        # screen locker (Super+Alt+L)
     brightnessctl   # XF86MonBrightness keys

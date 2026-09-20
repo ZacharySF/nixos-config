@@ -13,6 +13,12 @@
     };
   };
 
+  # Without an agent registered, bluetoothd has nobody to ask for
+  # authorization and silently rejects reconnects from paired devices
+  # ("Authentication attempt without agent" in the logs). Blueman runs one
+  # persistently in the background (plus a tray icon).
+  services.blueman.enable = true;
+
   # AmneziaVPN — GUI client plus the privileged helper it needs.
   programs.amnezia-vpn.enable = true;
 

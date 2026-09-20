@@ -5,20 +5,6 @@
 # per-project flake + `.envrc` (`use flake`) over adding more here — see
 # ../README.md "Per-project dev environments".
 { pkgs, ... }:
-let
-  # A Python interpreter with the scientific stack baked in. Import these
-  # directly (`python3`, `ipython`). For anything not listed, make a project
-  # venv with `uv`.
-  pythonForQuant = pkgs.python3.withPackages (ps: with ps; [
-    numpy
-    pandas
-    scipy
-    polars
-    matplotlib
-    scikit-learn
-    ipython
-  ]);
-in
 {
   home.packages = with pkgs; [
     # ---------------------------------------------------------------
@@ -68,7 +54,10 @@ in
     # ---------------------------------------------------------------
     # Python — scientific / quant
     # ---------------------------------------------------------------
-    pythonForQuant
+    # The interpreter itself (pandas, polars, scikit-learn, ipython, etc.)
+    # lives in the combined python313 environment in ece.nix — only one
+    # full python3.withPackages closure can live in home.packages at once
+    # without colliding on shared paths (bin/pydoc3, share/gdb/*).
     uv                # fast project/venv manager for per-project deps
     ruff              # linter/formatter
 

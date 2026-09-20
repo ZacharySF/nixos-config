@@ -22,6 +22,10 @@
     # hermes-agent — Nous Research's AI agent CLI (github:NousResearch/hermes-agent).
     hermes-agent.url = "github:NousResearch/hermes-agent";
     hermes-agent.inputs.nixpkgs.follows = "nixpkgs";
+
+    # oh-my-pi (omp) — Can Boluk's coding agent CLI (github:can1357/oh-my-pi).
+    oh-my-pi.url = "github:can1357/oh-my-pi";
+    oh-my-pi.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
