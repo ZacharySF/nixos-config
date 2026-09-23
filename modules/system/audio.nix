@@ -1,13 +1,5 @@
 # Audio: PipeWire (replaces PulseAudio and JACK).
-{ pkgs, lib, ... }:
-let
-  # Gitignored, machine-specific — see local-hardware.example.nix. Falls back
-  # to `null` (feature disabled) when no local-hardware.nix is present.
-  localHardware =
-    if builtins.pathExists ./local-hardware.nix
-    then import ./local-hardware.nix
-    else import ./local-hardware.example.nix;
-in
+{ pkgs, ... }:
 {
   services.pulseaudio.enable = false; # PipeWire provides the pulse interface instead
   security.rtkit.enable = true;       # lets audio threads get realtime priority
@@ -47,17 +39,22 @@ in
     };
   };
 
-  # WirePlumber only auto-picks a device as the default sink the first time
-  # it's ever seen; after that, whichever sink was last explicitly selected
-  # stays "sticky" even when a higher-priority device (like the AirPods)
-  # reconnects later, e.g. after boot before Bluetooth has reconnected. That's
-  # why the AirPods can be connected but audio still plays from the laptop
-  # speakers. This watches for the AirPods Pro sink appearing and forces it
-  # back to being the default output whenever that happens.
-  systemd.user.services.airpods-auto-default = lib.mkIf (localHardware.airpodsMac != null) {
-    description = "Auto-select AirPods Pro as default audio output when connected";
+  # Select AirPods once when their playback node appears, including after a
+  # reconnect or audio-service restart. Remember the node serial so manual
+  # output changes still work until the next connection. Discover the device
+  # at runtime: Git flakes exclude the gitignored local-hardware.nix file,
+  # which previously caused this service to disappear from system builds.
+  #
+  # Also self-heals mute/zero-volume: despite the SBC-XQ fix above, a fresh
+  # A2DP connection (or a mid-session transport hiccup) can still hand back a
+  # node that's muted or at 0% — silent audio with everything otherwise
+  # "working". Checked on every loop tick (not just on reconnect) so it
+  # recovers even if this happens mid-session, not only at initial connect.
+  systemd.user.services.airpods-auto-default = {
+    description = "Auto-select AirPods as default audio output when connected";
     wantedBy = [ "pipewire.service" ];
     after = [ "pipewire.service" "wireplumber.service" ];
+    partOf = [ "pipewire.service" ];
     serviceConfig = {
       ExecStart =
         let
@@ -67,22 +64,49 @@ in
               pkgs.wireplumber
               pkgs.pipewire
               pkgs.jq
+              pkgs.coreutils
               pkgs.gnugrep
+              pkgs.gawk
             ];
             text = ''
-              MAC="${localHardware.airpodsMac}"
+              previous_serial=""
               while true; do
-                target_id=$(pw-dump | jq -r --arg mac "$MAC" '
-                  .[] | select(.type=="PipeWire:Interface:Node")
-                  | select(.info.props["media.class"]? == "Audio/Sink")
-                  | select(.info.props["api.bluez5.address"]? == $mac)
-                  | .id' | head -n1)
+                # A timeout or a disappearing node is normal during reconnects.
+                if ! snapshot=$(timeout 5 pw-dump); then
+                  sleep 3
+                  continue
+                fi
+                target=$(jq -r '
+                  [.[] | select(.type == "PipeWire:Interface:Node")
+                  | select(.info.props["media.class"] == "Audio/Sink")
+                  | select(.info.props["device.api"] == "bluez5")
+                  | select((.info.props["node.description"] // "")
+                      | test("airpods"; "i"))]
+                  | sort_by(.info.props["object.serial"] | tonumber)
+                  | last
+                  | if . == null then ""
+                    else "\(.id) \(.info.props["object.serial"])" end
+                ' <<< "$snapshot")
 
-                if [ -n "$target_id" ]; then
-                  current_addr=$(wpctl inspect @DEFAULT_AUDIO_SINK@ 2>/dev/null \
-                    | grep -oP 'api\.bluez5\.address = "\K[^"]+' || true)
-                  if [ "$current_addr" != "$MAC" ]; then
-                    wpctl set-default "$target_id"
+                if [ -z "$target" ]; then
+                  previous_serial=""
+                else
+                  read -r target_id target_serial <<< "$target"
+                  if [ "$target_serial" != "$previous_serial" ]; then
+                    if wpctl set-default "$target_id"; then
+                      previous_serial="$target_serial"
+                      echo "Selected AirPods output (node $target_id)"
+                    fi
+                  fi
+
+                  vol_line=$(wpctl get-volume "$target_id" 2>/dev/null || true)
+                  vol_num=$(grep -oP '[0-9]+\.[0-9]+' <<< "$vol_line" | head -n1 || true)
+                  if grep -q MUTED <<< "$vol_line" \
+                    || [ -z "$vol_num" ] \
+                    || awk -v n="$vol_num" 'BEGIN { exit !(n < 0.05) }'; then
+                    wpctl set-mute "$target_id" 0
+                    wpctl set-volume "$target_id" 0.60
+                    echo "Restored AirPods volume (was: ''${vol_line:-unknown})"
                   fi
                 fi
                 sleep 3

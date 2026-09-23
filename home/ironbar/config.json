@@ -2,6 +2,7 @@
   "anchor_to_edges": true,
   "position": "top",
   "height": 24,
+  "popup_autohide": true,
   "margin": {
     "top": 4,
     "left": 8,
