@@ -36,6 +36,8 @@
     cmake
     ninja
     gnumake
+    m4                # GNU macro processor
+    bison             # parser generator; provides both `bison` and `yacc`
     pkg-config
     gdb
     lldb
