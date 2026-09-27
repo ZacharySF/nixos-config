@@ -17,4 +17,20 @@ in
       beautifulLyrics
     ];
   };
+
+  # Avoid the locked-keyring prompt when opening Spotify from the launcher.
+  # Basic storage does not use keyring encryption for Spotify's local credentials.
+  xdg.desktopEntries.spotify = {
+    name = "Spotify";
+    genericName = "Music Player";
+    icon = "spotify-client";
+    exec = "spotify --password-store=basic %U";
+    terminal = false;
+    mimeType = [ "x-scheme-handler/spotify" ];
+    categories = [ "Audio" "Music" "Player" "AudioVideo" ];
+    settings = {
+      TryExec = "spotify";
+      StartupWMClass = "spotify";
+    };
+  };
 }
