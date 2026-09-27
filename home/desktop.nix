@@ -55,7 +55,9 @@
 
   # A couple of GUI utilities that belong to "the desktop" rather than dev work.
   home.packages = with pkgs; [
+    anki           # spaced-repetition flashcards
     chromium       # web browser
+    tor-browser    # anonymous browsing; no system tor service/proxy involved
     nautilus       # file manager
     pavucontrol    # audio mixer
     wezterm       # terminal emulator

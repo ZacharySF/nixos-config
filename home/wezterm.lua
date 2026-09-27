@@ -13,8 +13,9 @@ config.text_background_opacity = 1.0
 config.colors = {
   background = "#171b34",
   foreground = "#c5ccef",
-  cursor_bg = "#79c7e8",
+  cursor_bg = "#c4a7e7",
   cursor_fg = "#171b34",
+  cursor_border = "#c4a7e7",
   ansi = {
     "#202744", "#9b83c4", "#719fc4", "#8f8fd0",
     "#7185e8", "#ad82c8", "#63bfc1", "#c5ccef",

@@ -19,9 +19,7 @@
   boot.loader.systemd-boot.configurationLimit = lib.mkForce 2;
   boot.loader.timeout = 5;
 
-  home-manager.users.xelo.programs.bash.shellAliases = {
-    rebuild = lib.mkForce "sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos-main";
-    rebuild-test = lib.mkForce "sudo nixos-rebuild test --flake ~/nixos-config#xelo-nixos-main";
-    rebuild-check = lib.mkForce "nixos-rebuild build --flake ~/nixos-config#xelo-nixos-main";
-  };
+  # The ESP contains systemd-boot's random seed. Restrict Linux access without
+  # changing the Windows files or the generated hardware configuration.
+  fileSystems."/boot".options = lib.mkForce [ "fmask=0077" "dmask=0077" ];
 }

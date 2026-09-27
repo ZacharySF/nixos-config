@@ -1,17 +1,18 @@
 # Interactive shell: bash config, prompt, core CLI tools, direnv.
-{ pkgs, ... }:
+{ osConfig, pkgs, ... }:
 {
   programs.bash = {
     enable = true;
 
     shellAliases = {
-      # Rebuild the system from this repo.
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#xelo-nixos";
-      # Build + activate WITHOUT adding a boot entry (reverts on reboot). Good
-      # for testing risky changes.
-      rebuild-test = "sudo nixos-rebuild test --flake ~/nixos-config#xelo-nixos";
+      # Derive all targets from the selected NixOS host; never default to the
+      # external installation in a shared Home Manager module.
+      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#${osConfig.networking.hostName}";
+      # Activate without changing the saved boot default. A reboot uses that
+      # default again, so make sure it is a known-good generation first.
+      rebuild-test = "sudo nixos-rebuild test --flake ~/nixos-config#${osConfig.networking.hostName}";
       # Just evaluate/build, do not touch the running system.
-      rebuild-check = "nixos-rebuild build --flake ~/nixos-config#xelo-nixos";
+      rebuild-check = "nixos-rebuild build --flake ~/nixos-config#${osConfig.networking.hostName}";
       # Pull newer nixpkgs/home-manager (updates flake.lock).
       update = "nix flake update --flake ~/nixos-config";
       # Format all nix files.
@@ -28,13 +29,40 @@
       # system summary on new interactive shells
       if [[ $- == *i* ]] && command -v fastfetch >/dev/null; then
         (
-          # Draw immediately; repaint if Niri resizes during rendering.
+          # Niri/WezTerm can finish sizing after fastfetch has sent its image.
+          # Require 150 ms of stable cell AND pixel dimensions, bounded to 1 s.
+          terminal_attached=0
+          [[ -t 0 && -t 1 ]] && terminal_attached=1
+          settled_terminal_size() {
+            if ((terminal_attached == 0)); then
+              stty size 2>/dev/null
+              return
+            fi
+            ${pkgs.perl}/bin/perl -MTime::HiRes=sleep -e '
+              open(my $tty, "<", "/dev/tty") or exit 1;
+              my ($previous, $stable) = ("", 0);
+              for my $sample (0 .. 20) {
+                my $size = pack("S4", 0, 0, 0, 0);
+                ioctl($tty, 0x5413, $size) or exit 1;
+                my ($rows, $cols, $width, $height) = unpack("S4", $size);
+                my $current = "$rows $cols $width $height";
+                $stable = $rows && $cols && $current eq $previous ? $stable + 1 : 0;
+                $previous = $current;
+                last if $stable >= 3;
+                sleep(0.05) if $sample < 20;
+              }
+              print "$previous\n";
+            '
+          }
+          # Catch even a resize that returns to the original dimensions.
+          trap 'resized=1' WINCH
           for ((attempt = 0; attempt < 3; attempt++)); do
-            before_size=$(stty size 2>/dev/null)
+            before_size=$(settled_terminal_size) || exit
+            resized=0
             # Fit the usual 86-column tile even before Niri finishes sizing it.
             logo_width=52
             # Reserve 34 columns for the summary (the host line uses 33).
-            read -r rows columns <<< "$before_size"
+            read -r rows columns pixel_width pixel_height <<< "$before_size"
             if [[ $columns =~ ^[0-9]+$ ]] && ((columns < 86)); then
               logo_width=$((columns > 34 ? columns - 34 : 1))
             fi
@@ -68,8 +96,12 @@
                 }
                 print "\e[1A\r" if $image_height;
               ' || exit
-            after_size=$(stty size 2>/dev/null)
-            if [[ ! -t 0 || ! -t 1 || "$before_size" == "$after_size" ]] || ((attempt == 2)); then
+            # Keep watching briefly after output: writing bytes does not mean
+            # the terminal has finished rendering or received its final size.
+            after_size=$(settled_terminal_size) || exit
+            if [[ ! -t 0 || ! -t 1 ]] ||
+              { [[ "$before_size" == "$after_size" ]] && ((resized == 0)); } ||
+              ((attempt == 2)); then
               break
             fi
             # This is a new shell: only its partially rendered welcome is cleared.

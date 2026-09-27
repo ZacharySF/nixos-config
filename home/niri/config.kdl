@@ -75,8 +75,9 @@ input {
     // warp-mouse-to-focus
 
     // Focus windows and outputs automatically when moving the mouse into them.
-    // Setting max-scroll-amount="0%" makes it work only on windows already fully on screen.
-    focus-follows-mouse max-scroll-amount="0%"
+    // Allow a small scroll so hover focus still works when a wide window (like Spotify)
+    // pushes its neighbor slightly off screen.
+    focus-follows-mouse max-scroll-amount="10%"
 }
 
 // You can configure outputs by their name, which you can find
@@ -418,6 +419,10 @@ binds {
     Mod+J     { focus-window-down; }
     Mod+K     { focus-window-up; }
     Mod+L     { focus-column-right; }
+
+    // Focus the neighboring window with Win + mouse click.
+    Super+MouseLeft  { focus-column-left; }
+    Super+MouseRight { focus-column-right; }
 
     Mod+Ctrl+Left  { focus-column-left; }
     Mod+Ctrl+Down  { focus-window-or-workspace-down; }

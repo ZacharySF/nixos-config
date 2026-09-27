@@ -37,6 +37,7 @@
   # even though nothing here uses a screen reader. Mask it; if you ever wire
   # up accessibility/TTS, flip this back.
   systemd.user.services.speech-dispatcher.enable = false;
+  systemd.user.sockets.speech-dispatcher.enable = false;
 
   # Firefox system-wide (so it works regardless of the user environment state).
   programs.firefox.enable = true;
