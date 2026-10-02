@@ -375,7 +375,9 @@ binds {
     Mod+Tab { spawn "fuzzel"; }
     Mod+T { spawn "firefox"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: wezterm" { spawn "wezterm"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
+    // Elan touchpad sometimes wedges (firmware bug) — re-initialise it. See modules/system/touchpad.nix.
+    Mod+Alt+T hotkey-overlay-title="Reset Touchpad" { spawn "touchpad-reset"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.

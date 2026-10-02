@@ -103,7 +103,7 @@ flake.nix
 Intel laptop. Boots via systemd-boot, latest kernel. `greetd` uses `tuigreet`
 to prompt for credentials and start a **Niri** (scrollable-tiling Wayland) session.
 The session pieces are separate programs: **ironbar** (bar), **fuzzel**
-(launcher, `Mod+Tab`), **mako** (notifications), **swaylock** (`Super+Alt+L`),
+(launcher, `Mod+Tab`), **mako** (notifications), **hyprlock** (`Super+Alt+L`),
 **WezTerm** (terminal, `Mod+Return`), **swaybg** (wallpaper). Audio is PipeWire,
 networking is NetworkManager, Bluetooth is on. Docker is enabled. `nix-ld` lets
 non-Nix binaries run. Firewall is default-deny.

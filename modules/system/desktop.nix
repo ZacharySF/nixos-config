@@ -48,6 +48,10 @@
   services.gnome.gnome-keyring.enable = true;   # Secret Service API (logins, tokens)
   security.pam.services.greetd.enableGnomeKeyring = true; # unlock keyring at login
 
+  # hyprlock (home/niri) authenticates through its own PAM service; without
+  # this entry it falls back to `su` and the screen can never be unlocked.
+  security.pam.services.hyprlock = { };
+
   services.dbus.implementation = "dbus"; # keep classic dbus; broker requires reboot to switch
   services.printing.enable = true; # CUPS
 
@@ -55,5 +59,6 @@
     nerd-fonts.jetbrains-mono # UI + terminal font with icons (used by ironbar/niri)
     nerd-fonts.symbols-only   # icon glyphs to patch into other fonts
     inconsolata               # foot terminal font
+    cinzel                    # dark-fantasy display serif (hyprlock lock screen)
   ];
 }

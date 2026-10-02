@@ -19,13 +19,18 @@
   # clicked. Give them a real timeout.
   xdg.configFile."mako/config".source = ./mako.conf;
 
+  # Screen locker. hyprlock speaks ext-session-lock-v1, so it works under Niri
+  # with no Hyprland involved. PAM auth for it is enabled system-side in
+  # modules/system/desktop.nix.
+  xdg.configFile."hypr/hyprlock.conf".source = ./hyprlock.conf;
+
   home.packages = with pkgs; [
     swaybg          # wallpaper (spawned at startup — see config.kdl)
     mako            # notification daemon
     libnotify       # notify-send — used by Claude Code / Codex hooks for desktop popups
     fuzzel          # application launcher (Mod+Tab)
     bzmenu          # bluetooth TUI menu (Mod+B)
-    swaylock        # screen locker (Super+Alt+L)
+    hyprlock        # screen locker (Super+Alt+L)
     brightnessctl   # XF86MonBrightness keys
     playerctl       # XF86Audio media keys
     xwayland-satellite # run X11-only apps under Niri

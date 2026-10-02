@@ -11,5 +11,6 @@
     ./desktop.nix
     ./users.nix
     ./packages.nix
+    ./touchpad.nix
   ];
 }

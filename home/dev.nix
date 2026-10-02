@@ -4,14 +4,20 @@
 # whole section you are not using. For project-specific toolchains prefer a
 # per-project flake + `.envrc` (`use flake`) over adding more here — see
 # ../README.md "Per-project dev environments".
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   home.packages = with pkgs; [
     # ---------------------------------------------------------------
     # AI coding assistants
     # ---------------------------------------------------------------
     codex             # OpenAI Codex CLI
-    claude-code       # Claude Code CLI
+    # Pinned ahead of nixpkgs via the upstream release manifest. Refresh with:
+    #   curl -fsSL https://downloads.claude.ai/claude-code-releases/<ver>/manifest.zst.json \
+    #     -o pkgs/claude-code/manifest.zst.json
+    # Drop the override once nixpkgs catches up.
+    (claude-code.override {
+      manifest = lib.importJSON ../pkgs/claude-code/manifest.zst.json;
+    })                # Claude Code CLI
 
     # ---------------------------------------------------------------
     # General development
