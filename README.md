@@ -76,6 +76,9 @@ home/                         everything inside /home/xelo (home-manager)
   foot.nix                    terminal emulator (colours in Nix)
   ironbar.nix                 status bar (raw config.json/style.css + battery script)
   ironbar/                    those raw files
+  skwd-theme/                 app colours follow the skwd-wall wallpaper palette
+    default.nix               integrations, reload hooks, fallbacks, config.json merge
+    templates/                colour-only templates (copied once into skwd-wall)
   btop.nix                    system monitor config
   editors.nix                 zed / vscode / obsidian
   zed/settings.json           zed config (raw)
@@ -122,12 +125,88 @@ startup apps, keyboard repeat rate, `Mod+T` → Firefox, `Mod+B` → bluetooth m
 | Activate temporarily; next boot uses the saved default | `rebuild-test` |
 | Just check it builds, don't touch system | `rebuild-check` |
 | Update nixpkgs / home-manager | `update` then `rebuild` |
+| Update only OMP | `nix flake update oh-my-pi --flake ~/nixos-config` then `rebuild` |
 | Roll back | reboot → pick previous generation in the boot menu, **or** `sudo nixos-rebuild switch --rollback` |
 | Format nix files | `nixfmt` |
 | Free unreferenced store paths, retaining generations | `nix-collect-garbage` (older generations are pruned weekly) |
 
 To change something, edit the relevant file under `modules/` or `home/`, then
 `rebuild`. Commit afterwards.
+
+### Audio and Bluetooth popups
+
+The speaker and microphone indicators have separate compact mixers:
+
+- **Click** the speaker for the default output and per-application volume/mute controls.
+- **Click** the microphone for the default input and recording-application controls.
+- **Middle-click** either indicator to toggle that device's mute without opening a menu.
+- **Scroll** either indicator to adjust its volume in 2% steps, capped at 100%.
+- **Right-click** for Pavucontrol, including per-application routing and device settings.
+- Click the same indicator again, or click outside, to dismiss a popup.
+
+Bluetooth uses the same flat, slightly cooler Catppuccin Mocha palette as audio.
+Both panels are 96% opaque with compact regular-weight text. Audio sliders show
+a small round handle only on hover, keyboard focus, or dragging. Bar hover help
+boxes are disabled; Bluetooth device status and battery information remain in
+its popup. The Bluetooth list scrolls after 260 pixels.
+
+Edit `home/ironbar/config.json` and `home/ironbar/style.css`, then rebuild as above.
+To make the running bar pick up the installed files without logging out:
+
+```sh
+ironbar reload
+ironbar style load-css ~/.config/ironbar/style.css
+```
+
+The center label (focused app) is filled by `~/.local/bin/ironbar-focused-app`,
+which Niri starts at login. After changing `home/ironbar/focused-app.py` and
+rebuilding, restart it:
+
+```sh
+pkill -f ironbar-focused-app; niri msg action spawn -- ~/.local/bin/ironbar-focused-app
+```
+
+### Wallpaper-driven colours (skwd-wall)
+
+Each time skwd-wall applies a wallpaper it renders the templates registered in
+`~/.config/skwd-wall-v2/config.json` → `integrations` into
+`~/.local/state/skwd-theme/` (btop: `~/.config/btop/themes/skwd-managed.theme`).
+The Nix-managed configs of Ironbar, Niri, WezTerm, mako, fuzzel, foot and btop
+include those files; reload hooks live in `~/.config/skwd-theme/hooks/`.
+
+- Live: Ironbar, Niri focus ring, WezTerm, btop, mako. Next open: fuzzel, foot.
+- `gtk-mode` sets GTK4/libadwaita light/dark from the palette; GTK3 stays Adwaita-dark.
+- Templates are copied into `~/.config/skwd-wall-v2/matugen/templates/` only if
+  missing, so edits there survive rebuilds; delete one to get the repo version back.
+- Activation only *adds* integrations that are missing by name; edit or delete
+  them freely in the skwd-wall GUI. Saved wallpaper profiles override generated colours.
+- Re-render without changing wallpaper: `skwd-helm retheme`.
+- After restarting Ironbar by hand its colours stay correct; live recolouring resumes on
+  the next wallpaper change (the hook re-registers the sheet once per Ironbar process).
+
+### Transparent Firefox
+
+`home/desktop.nix` manages the default profile's Linux transparency preferences,
+`userChrome.css`, `userContent.css`, and the hash-pinned Zen Internet 3.2.0 add-on.
+The active profile is `~/.mozilla/firefox/default`. Keep **System theme — auto**
+enabled; opaque themes cover the glass effect. Restart Firefox after changing CSS.
+Adjust `--ft-tint` in `userChrome` to change the current 35% dark tint.
+
+Zen Internet is pinned to the toolbar. Its runtime settings and downloaded styles
+remain in the profile rather than being reset on each rebuild: **Global Styling**,
+**Auto Update**, and **Force Styling** are enabled. On a new profile, click
+**Refetch latest styles** once and enable Force Styling. Use **Skip Forcing for
+this Site** if a website becomes unreadable. The older Transparent Zen add-on was
+disabled, not deleted, to avoid conflicting styles.
+
+`home/niri/config.kdl` enables native background blur for Firefox only, with
+`draw-border-with-background false` so the focus ring does not fill the window.
+This uses niri 26.04's built-in blur; no compositor fork or whole-window opacity
+rule is needed, so text and images stay opaque. Firefox's restricted pages
+(including Settings, AMO, and the PDF viewer) are not restyled by the add-on.
+
+The pre-change preferences and desktop configuration are backed up under
+`~/.local/state/firefox-transparency-backup/20261016-134443/`.
 
 ---
 

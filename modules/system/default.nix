@@ -12,5 +12,6 @@
     ./users.nix
     ./packages.nix
     ./touchpad.nix
+    ./skwd-wall.nix
   ];
 }

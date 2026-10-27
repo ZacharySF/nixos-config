@@ -2,7 +2,9 @@
 #
 # config.json / style.css are kept as raw files (they were already hand-tuned
 # and ironbar's schema changes often). The battery indicator is a tiny shell
-# script that config.json calls every 30s.
+# script that config.json calls every 30s. The center focused-app label shows
+# the `focused_app` ironvar, which ironbar-focused-app (also spawned by Niri at
+# startup) keeps current on every monitor's bar.
 { pkgs, ... }:
 {
   home.packages = [ pkgs.ironbar ];

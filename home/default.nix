@@ -12,6 +12,7 @@
     ./foot.nix       # terminal emulator
     ./wezterm.nix    # WezTerm appearance
     ./ironbar.nix    # status bar
+    ./skwd-theme     # app colours follow skwd-wall's wallpaper palette
     ./btop.nix       # system monitor config
     ./editors.nix    # zed / vscode / obsidian
     ./dev.nix        # quant + computer-architecture toolchain

@@ -10,20 +10,16 @@ config.initial_cols = 90
 config.initial_rows = 40
 config.window_background_opacity = 0.85
 config.text_background_opacity = 1.0
-config.colors = {
-  background = "#171b34",
-  foreground = "#c5ccef",
-  cursor_bg = "#c4a7e7",
-  cursor_fg = "#171b34",
-  cursor_border = "#c4a7e7",
-  ansi = {
-    "#202744", "#9b83c4", "#719fc4", "#8f8fd0",
-    "#7185e8", "#ad82c8", "#63bfc1", "#c5ccef",
-  },
-  brights = {
-    "#536083", "#c0a5e8", "#8bc0e8", "#aaa9ed",
-    "#91a2ff", "#c29be0", "#82d9d5", "#e0e5ff",
-  },
-}
+
+-- Colours are rendered by skwd-wall from the wallpaper (home/skwd-theme).
+-- Watching the file makes open windows recolour when it is rewritten.
+local theme = wezterm.home_dir .. "/.local/state/skwd-theme/wezterm.lua"
+wezterm.add_to_config_reload_watch_list(theme)
+local ok, colors = pcall(dofile, theme)
+if ok then
+  config.colors = colors
+else
+  wezterm.log_warn("skwd theme not loaded: " .. tostring(colors))
+end
 
 return config

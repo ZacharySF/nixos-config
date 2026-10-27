@@ -26,6 +26,10 @@
     # oh-my-pi (omp) — Can Boluk's coding agent CLI (github:can1357/oh-my-pi).
     oh-my-pi.url = "github:can1357/oh-my-pi";
     oh-my-pi.inputs.nixpkgs.follows = "nixpkgs";
+
+    # skwd-wall — wallpaper selector/engine. Packages live on the `nix` branch.
+    skwd-wall.url = "github:liixini/skwd-wall/nix";
+    skwd-wall.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

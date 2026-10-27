@@ -5,7 +5,7 @@
   programs.btop = {
     enable = true;
     settings = {
-      color_theme = "Default";
+      color_theme = "skwd-managed"; # rendered by skwd-wall (home/skwd-theme)
       theme_background = true;
       truecolor = true;
       rounded_corners = true;

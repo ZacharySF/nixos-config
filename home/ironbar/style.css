@@ -1,3 +1,7 @@
+/* Colours come from skwd-wall (home/skwd-theme): @bg @surface @surface_high @fg
+   @fg_dim @accent @on_accent @border @outline @urgent. Keep the import first. */
+@import url("file:///home/xelo/.local/state/skwd-theme/ironbar.css");
+
 window {
   background-color: transparent;
 }
@@ -15,7 +19,7 @@ window {
 * {
   font-family: "JetBrainsMono Nerd Font", monospace;
   font-size: 14px;
-  color: #c0caf5;
+  color: @fg;
   padding: 0;
   margin: 0;
   min-height: 0;
@@ -26,14 +30,14 @@ window {
 }
 
 .widget {
-  background-color: rgba(26, 27, 38, 0.85);
+  background-color: alpha(@bg, 0.85);
   border-radius: 8px;
   padding: 0px 6px;
   margin: 0px 3px;
 }
 
 .clock, .volume, .bluetooth, .battery, .sys_info {
-  background-color: rgba(26, 27, 38, 0.85);
+  background-color: alpha(@bg, 0.85);
   border-radius: 8px;
   padding: 0px 6px;
   margin: 0px 3px;
@@ -45,8 +49,8 @@ window {
 }
 
 #focused-app {
-  color: #91a2ff;
-  background-color: rgba(26, 27, 38, 0.85);
+  color: @accent;
+  background-color: alpha(@bg, 0.85);
   border-radius: 8px;
   padding: 0px 10px;
   font-weight: 600;
@@ -67,41 +71,251 @@ popover {
   padding: 0;
 }
 
-.popup, .popup-volume {
-  background-color: #000000;
+.popup {
+  background-color: @bg;
   background-image: none;
   border-radius: 8px;
 }
 
-/* Bluetooth-only look — scoped to `.popup-bluetooth` specifically (not the
-   shared `.popup` class above) so volume/clock/tray/etc. popups keep their
-   original plain look and aren't affected by this. */
+/* Audio and Bluetooth match Spotify's Catppuccin Mocha theme.
+   Keep the panels compact and mostly opaque, without nested cards. */
+.popup-volume,
 .popup-bluetooth {
-  background-color: rgba(26, 27, 38, 0.85);
-  border: 1.5px solid #7fc8ff;
-  border-radius: 8px;
-  padding: 8px;
+  background-color: alpha(@surface, 0.96);
+  background-image: none;
+  border: 1px solid @border;
+  border-radius: 6px;
+  padding: 10px 12px;
+  min-width: 260px;
 }
 
-/* Real label classes confirmed from ironbar's bluetooth module source:
-   `.header .label` is the adapter toggle row, `.device .header-label`/
-   `.footer-label` are the per-device name/status. All plain GtkLabels
-   (set_text, no markup), so this is enough to win over the GTK theme. */
-.popup-bluetooth .label,
-.popup-bluetooth .header-label,
+.popup-volume,
+.popup-volume *,
+.popup-bluetooth,
+.popup-bluetooth * {
+  font-family: "DejaVu Sans", "JetBrainsMono Nerd Font", sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: @fg;
+}
+
+.popup-volume .sink-box,
+.popup-volume .source-box {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.popup-volume .app-box,
+.popup-bluetooth .device {
+  background: none;
+  border: none;
+  border-top: 1px solid alpha(@border, 0.35);
+  border-radius: 0;
+  padding: 6px 0 0;
+  margin: 0;
+}
+
+.popup-volume .title {
+  margin-bottom: 2px;
+}
+
+.popup-volume .device-selector > button {
+  background: @surface;
+  border: 1px solid @border;
+  border-radius: 3px;
+  padding: 4px 6px;
+  min-height: 18px;
+}
+
+.popup-volume .device-selector arrow {
+  color: @accent;
+  min-width: 12px;
+  min-height: 12px;
+  margin-left: 6px;
+}
+
+.popup-volume .device-selector popover contents {
+  background: @bg;
+  border: 1px solid @border;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.popup-volume .device-selector listview,
+.popup-volume .device-selector listview row {
+  background: @bg;
+}
+
+.popup-volume .device-selector listview row {
+  padding: 5px 6px;
+  border-radius: 2px;
+}
+
+.popup-volume .device-selector listview row:selected,
+.popup-volume .device-selector listview row:hover {
+  background: @surface_high;
+}
+
+.popup-volume .slider {
+  min-width: 230px;
+  min-height: 18px;
+  padding: 3px 0;
+  margin: 2px 5px;
+}
+
+.popup-volume .slider trough {
+  background: @border;
+  border: none;
+  border-radius: 2px;
+  min-height: 4px;
+}
+
+.popup-volume .slider highlight {
+  background: @accent;
+  border-radius: 2px;
+  min-height: 4px;
+}
+
+/* The reference only reveals its small round thumb on hover or interaction.
+   Its allocation stays constant, so hovering never moves the track. */
+.popup-volume .slider slider {
+  background: @accent;
+  border: none;
+  border-radius: 50%;
+  min-width: 10px;
+  min-height: 10px;
+  margin: -3px;
+  opacity: 0;
+}
+
+.popup-volume .slider:hover slider,
+.popup-volume .slider.dragging slider,
+.popup-volume .slider:focus-visible slider {
+  opacity: 1;
+}
+
+.popup-volume .slider value {
+  color: @fg;
+  font-size: 11px;
+}
+
+.popup-volume .btn-mute {
+  background: none;
+  border: none;
+  border-radius: 3px;
+  padding: 1px 4px;
+  min-height: 20px;
+}
+
+.popup-volume .btn-mute label {
+  color: @accent;
+  font-size: 12px;
+}
+
+.popup-volume .btn-mute:hover,
+.popup-volume .device-selector > button:hover {
+  background: @surface_high;
+}
+
+.popup-volume .btn-mute:checked {
+  background: @surface_high;
+}
+
+.popup-volume .btn-mute:checked label {
+  color: @fg;
+}
+
+.popup-volume button:focus-visible,
+.popup-volume .slider:focus-visible trough,
+.popup-bluetooth switch:focus-visible {
+  outline: 1px solid @accent;
+  outline-offset: 2px;
+}
+
+.popup-volume .slider:disabled,
+.popup-bluetooth switch:disabled {
+  opacity: 0.45;
+}
+
+.volume:hover,
+.bluetooth:hover {
+  background-color: alpha(@surface_high, 0.95);
+}
+
+.volume .muted {
+  color: @accent;
+}
+
+.popup-bluetooth .header {
+  padding-bottom: 8px;
+}
+
+.popup-bluetooth .header .label {
+  margin-left: 10px;
+}
+
+.popup-bluetooth .device {
+  padding: 8px 0;
+}
+
+.popup-bluetooth .status {
+  margin-right: 14px;
+}
+
 .popup-bluetooth .footer-label {
-  font-family: "JetBrainsMono Nerd Font", monospace;
-  font-weight: 600;
-  color: #c0caf5;
+  color: @fg_dim;
+  font-size: 11px;
+  margin-top: 3px;
 }
 
-/* The device icon is a real icon-theme image (Adwaita) with no text-glyph
-   equivalent, so it always looks out of place next to the bar's Nerd Font
-   icons. Drop it entirely, same treatment as `.battery image` above, for a
-   clean text-only row instead of a mismatched icon. */
+.popup-bluetooth switch {
+  background: @border;
+  border: none;
+  border-radius: 9px;
+  min-width: 32px;
+  min-height: 18px;
+  padding: 1px;
+}
+
+.popup-bluetooth switch slider {
+  background: @fg;
+  border: none;
+  border-radius: 50%;
+  min-width: 14px;
+  min-height: 14px;
+  margin: 1px;
+}
+
+.popup-bluetooth switch:checked {
+  background: @accent;
+}
+
+.popup-bluetooth switch:checked slider {
+  background: @on_accent;
+}
+
+.popup-bluetooth switch:hover {
+  box-shadow: 0 0 0 1px @accent;
+}
+
+.popup-bluetooth switch image,
 .popup-bluetooth .icon-box,
 .popup-bluetooth .icon-box image {
   opacity: 0;
   min-width: 0;
   min-height: 0;
+}
+
+.popup-bluetooth scrollbar trough {
+  background: @surface_high;
+  min-width: 4px;
+}
+
+.popup-bluetooth scrollbar slider {
+  background: @outline;
+  border-radius: 2px;
+  min-width: 4px;
+  min-height: 24px;
 }

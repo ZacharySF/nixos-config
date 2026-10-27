@@ -18,27 +18,75 @@
       "interval": 5
     },
     {
-      "type": "bluetooth"
+      "type": "bluetooth",
+      "name": "bluetooth",
+      "icon_size": 16,
+      "popup": {
+        "header": "Bluetooth",
+        "max_height": {
+          "pixels": 260
+        }
+      },
+      "device_status": {
+        "disconnected": "Disconnected"
+      }
     }
   ],
   "center": [
     {
-      "type": "script",
+      "type": "label",
       "name": "focused-app",
-      "cmd": "/home/xelo/.local/bin/ironbar-focused-app",
-      "mode": "watch"
+      "label": "#focused_app"
     }
   ],
   "end": [
     {
       "type": "volume",
-      "format": "{icon} {percentage}%",
+      "name": "audio-output",
+      "format": "󰕾 {percentage}%",
+      "mute_format": "󰝟 Muted",
+      "show_sources": false,
+      "popup_orientation": "vertical",
+      "sink_slider_orientation": "horizontal",
+      "source_slider_orientation": "horizontal",
+      "max_volume": 100,
+      "truncate_popup": {
+        "mode": "end",
+        "max_length": 32
+      },
+      "use_default_profiles": false,
       "icons": {
-        "volume_high": "󰕾",
-        "volume_medium": "󰖀",
-        "volume_low": "󰕿",
-        "muted": "󰝟"
-      }
+        "volume": "Mute",
+        "muted": "Unmute"
+      },
+      "on_click_middle": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+      "on_click_right": "pavucontrol",
+      "on_scroll_up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 2%+",
+      "on_scroll_down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
+    },
+    {
+      "type": "volume",
+      "name": "audio-input",
+      "format": " {percentage}%",
+      "mute_format": " Muted",
+      "show_sinks": false,
+      "popup_orientation": "vertical",
+      "sink_slider_orientation": "horizontal",
+      "source_slider_orientation": "horizontal",
+      "max_volume": 100,
+      "truncate_popup": {
+        "mode": "end",
+        "max_length": 32
+      },
+      "use_default_profiles": false,
+      "icons": {
+        "mic_volume": "Mute microphone",
+        "mic_muted": "Unmute microphone"
+      },
+      "on_click_middle": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+      "on_click_right": "pavucontrol --tab=4",
+      "on_scroll_up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SOURCE@ 2%+",
+      "on_scroll_down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 2%-"
     },
     {
       "type": "script",

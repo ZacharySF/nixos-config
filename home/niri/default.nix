@@ -37,6 +37,6 @@
   ];
 
   # Keep both existing wallpaper paths available on every installation.
-  home.file."Pictures/wallpaper.jpg".source = ../wallpaper/wallpaper.jpg;
+  home.file."pictures/wallpaper.jpg".source = ../wallpaper/wallpaper.jpg;
   xdg.configFile."background".source = ../wallpaper/wallpaper.jpg;
 }

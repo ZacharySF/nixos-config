@@ -177,14 +177,8 @@ layout {
         // - RGB hex: "#rgb", "#rgba", "#rrggbb", "#rrggbbaa"
         // - CSS-like notation: "rgb(255, 127, 0)", rgba(), hsl() and a few others.
 
-        // Color of the ring on the active monitor.
-        active-color "#7fc8ff"
-
-        // Color of the ring on inactive monitors.
-        //
-        // The focus ring only draws around the active window, so the only place
-        // where you can see its inactive-color is on other monitors.
-        inactive-color "#505050"
+        // active-color / inactive-color come from skwd-wall: see the
+        // `include` at the end of this file (home/skwd-theme).
 
         // You can also use gradients. They take precedence over solid colors.
         // Gradients are rendered the same as CSS linear-gradient(angle, from, to).
@@ -209,11 +203,7 @@ layout {
         off
 
         width 1.5
-        active-color "#703BE7"
-        inactive-color "#a9b1d6"
-
-        // Color of the border around windows that request your attention.
-        urgent-color "#9b0000"
+        // active/inactive/urgent colors come from skwd-wall (include at the end).
 
         // Gradients can use a few different interpolation color spaces.
         // For example, this is a pastel rainbow gradient via in="oklch longer hue".
@@ -279,8 +269,10 @@ layout {
 // See the binds section below for more spawn examples.
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
-spawn-at-startup "swaybg" "-i" "/home/xelo/Pictures/wallpaper.jpg" "-m" "fill"
+spawn-at-startup "swaybg" "-i" "/home/xelo/pictures/wallpaper.jpg" "-m" "fill"
 spawn-at-startup "sh" "-c" "IRONBAR_CSS=~/.config/ironbar/style.css ironbar"
+// Keeps the bar's focused-app label current on every monitor (home/ironbar/focused-app.py).
+spawn-at-startup "/home/xelo/.local/bin/ironbar-focused-app"
 spawn-at-startup "mako"
 spawn-at-startup "blueman-applet"
 layer-rule {
@@ -306,7 +298,7 @@ hotkey-overlay {
 // You can change the path where screenshots are saved.
 // A ~ at the front will be expanded to the home directory.
 // The path is formatted with strftime(3) to give you the screenshot date and time.
-screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+screenshot-path "~/pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 // You can also set this to null to disable saving screenshots to disk.
 // screenshot-path null
@@ -337,6 +329,15 @@ window-rule {
     // You can get away with just app-id="wezterm" if you want.
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
     default-column-width { proportion 0.5; }
+}
+
+// Firefox clears its own backgrounds; blur only those pixels, not text/images.
+window-rule {
+    match app-id=r#"^(org\.mozilla\.)?firefox$"#
+    draw-border-with-background false
+    background-effect {
+        blur true
+    }
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
@@ -378,6 +379,7 @@ binds {
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
     // Elan touchpad sometimes wedges (firmware bug) — re-initialise it. See modules/system/touchpad.nix.
     Mod+Alt+T hotkey-overlay-title="Reset Touchpad" { spawn "touchpad-reset"; }
+    Mod+Y hotkey-overlay-title="Wallpaper Picker: skwd-wall" { spawn "skwd-wall-v2"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
@@ -644,3 +646,7 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 }
+
+// Wallpaper-derived focus-ring/border colors rendered by skwd-wall
+// (home/skwd-theme). Keep this LAST so its values win.
+include optional=true "~/.local/state/skwd-theme/niri.kdl"
