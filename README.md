@@ -130,6 +130,12 @@ startup apps, keyboard repeat rate, `Mod+T` → Firefox, `Mod+B` → bluetooth m
 | Format nix files | `nixfmt` |
 | Free unreferenced store paths, retaining generations | `nix-collect-garbage` (older generations are pruned weekly) |
 
+OMP is pinned to **18.13.1** (upstream revision
+`0cc43441f1e95d3b42fb16044882763db1a0cc9a`) in `flake.lock`.
+After updating only its input, use `rebuild-check` to build the complete
+`xelo-nixos-main` configuration without activation, then `rebuild` when ready
+to activate it. The running `omp --version` changes only after activation.
+
 To change something, edit the relevant file under `modules/` or `home/`, then
 `rebuild`. Commit afterwards.
 
