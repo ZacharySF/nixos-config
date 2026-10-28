@@ -369,6 +369,24 @@ window-rule {
     clip-to-geometry true
 }
 
+// Wispr Flow's status pill: a transparent 512x614 window with the pill painted
+// along its bottom edge. Float it at the bottom centre like on Windows, and drop
+// the focus ring/border, whose solid background showed as a white box, and the
+// rounded clip/shadow. Its whole box still takes pointer input (Wayland gives it
+// no click-through), so hovering it can steal focus via focus-follows-mouse.
+window-rule {
+    match app-id="^wispr-flow$" title="^(Status|Flow Status Indicator)$"
+    open-floating true
+    open-focused false
+    default-floating-position x=0 y=0 relative-to="bottom"
+    draw-border-with-background false
+    focus-ring { off; }
+    border { off; }
+    shadow { off; }
+    geometry-corner-radius 0
+    clip-to-geometry false
+}
+
 binds {
 
     Mod+Shift+Slash { show-hotkey-overlay; }
