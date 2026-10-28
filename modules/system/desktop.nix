@@ -54,6 +54,22 @@
 
   services.dbus.implementation = "dbus"; # keep classic dbus; broker requires reboot to switch
   services.printing.enable = true; # CUPS
+  services.printing.drivers = [ pkgs.brlaser ]; # open-source driver for Brother lasers
+
+  # Brother MFC-L2750DW on USB. Declared here so the queue exists after every
+  # rebuild instead of being clicked together in the CUPS web UI.
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "Brother_MFC-L2750DW";
+        description = "Brother MFC-L2750DW (USB)";
+        deviceUri = "usb://Brother/MFC-L2750DW%20series?serial=U65037A1N725443";
+        model = "drv:///brlaser.drv/brl2750d.ppd";
+        ppdOptions.PageSize = "Letter";
+      }
+    ];
+    ensureDefaultPrinter = "Brother_MFC-L2750DW";
+  };
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono # UI + terminal font with icons (used by ironbar/niri)
