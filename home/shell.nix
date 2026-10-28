@@ -26,6 +26,11 @@
     };
 
     initExtra = ''
+      # User scripts and agent tools (treehouse, gh-axi, tasks-axi, kitty!).
+      # Also here, not only in home.sessionPath: terminals such as herdr pass
+      # on __HM_SESS_VARS_SOURCED, so their new shells skip hm-session-vars.
+      case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) PATH="$HOME/.local/bin:$PATH" ;; esac
+
       # blue user@host:path prompt
       PS1='\[\e[38;2;122;162;247m\]\u@\h:\w\$ \[\e[0m\]'
 
@@ -114,6 +119,9 @@
       fi
     '';
   };
+
+  # ~/.local/bin on PATH for login sessions and desktop-launched programs.
+  home.sessionPath = [ "$HOME/.local/bin" ];
 
   # Core command-line tools that follow you everywhere.
   home.packages = with pkgs; [
