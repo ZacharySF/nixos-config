@@ -369,12 +369,15 @@ window-rule {
     clip-to-geometry true
 }
 
-// Wispr Flow's status pill: a transparent window with the pill painted along its
-// bottom edge. Appearance only: niri painted its focus ring as a solid
-// background, which showed as a white box when the pointer focused it.
-// Placement and focus are deliberately left at niri's defaults.
+// Wispr Flow's status pill: a transparent 512x614 window with the pill painted
+// along its bottom edge. It swallows every click inside its box (Wayland has no
+// click-through) and ignores resize requests, so park it almost entirely off the
+// top-right corner; niri keeps only a small sliver on screen. The pill is then
+// off-screen too, which is fine with "Show Flow Bar at all times" off.
+// niri also painted its focus ring as a solid background (the white box).
 window-rule {
     match app-id="^wispr-flow$" title="^(Status|Flow Status Indicator)$"
+    default-floating-position x=-1000 y=-1000 relative-to="top-right"
     draw-border-with-background false
     focus-ring { off; }
     border { off; }
