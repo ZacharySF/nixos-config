@@ -13,23 +13,31 @@
 {
   lib,
   appimageTools,
+  callPackage,
   fetchurl,
   wl-clipboard,
 }:
 let
   pname = "wispr-flow";
-  version = "1.6.957"; # upstream Wispr Flow app
-  portVersion = "1.0.4"; # wispr-flow-linux packaging
+  version = "1.6.1209"; # upstream Wispr Flow app
+  portVersion = "1.0.5"; # wispr-flow-linux packaging (helper 0.1.3: keyboard hotplug)
 
   src = fetchurl {
     url = "https://github.com/wispr-flow-linux/wispr-flow-linux/releases/download/v${portVersion}%2Bwispr${version}/wispr-flow-${version}-${portVersion}-x86_64.AppImage";
-    hash = "sha256-2jeeMDWVnkadE5lyjwb1ThKplYoxp5P/GgZ39OEtiMU=";
+    hash = "sha256-pPXPVkO3i2Adqdmny7sbyDpchl6EvGAojby+xOSDz8Q=";
   };
 
-  contents = appimageTools.extract { inherit pname version src; };
+  helper = callPackage ./helper.nix { };
+  contents = appimageTools.extract {
+    inherit pname version src;
+    postExtract = ''
+      rm $out/usr/lib/wispr-flow/resources/Release/wispr-flow-linux-helper
+      ln -s ${helper}/bin/wispr-flow-linux-helper $out/usr/lib/wispr-flow/resources/Release/wispr-flow-linux-helper
+    '';
+  };
 in
-appimageTools.wrapType2 {
-  inherit pname version src;
+appimageTools.wrapAppImage {
+  inherit pname version src contents;
 
   # Hard runtime dependency on Wayland: clipboard paste + selection reads.
   extraPkgs = _: [ wl-clipboard ];

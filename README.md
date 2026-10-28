@@ -142,6 +142,25 @@ to activate it. The running `omp --version` changes only after activation.
 To change something, edit the relevant file under `modules/` or `home/`, then
 `rebuild`. Commit afterwards.
 
+### Wispr Flow dictation
+
+The package pins Wispr Flow **1.6.1209**, Linux packaging **1.0.5**, and helper
+**0.1.3**. The helper discovers keyboards connected after startup and avoids
+leaving modifiers stuck after paste. The configured push-to-talk shortcut is
+**Left Ctrl + Left Alt**.
+
+`pkgs/wispr-flow/niri-terminal-paste.patch` uses niri's read-only `FocusedWindow`
+socket request at paste time: known terminals receive **Ctrl+Shift+V**; other
+applications keep **Ctrl+V**. It does not change niri configuration or terminal
+keybindings. The pinned helper build runs its regression suite, including the
+terminal/non-terminal and missing-focus cases.
+
+For an app-only update without activating the rest of NixOS, build the package
+with the flake's pinned nixpkgs and install the resulting store path with
+`nix profile add`. This user-profile copy takes precedence over the system copy.
+After a normal system rebuild includes the same repair, remove that temporary
+copy with `nix profile remove wispr-flow` so future system updates take effect.
+
 ### Audio and Bluetooth popups
 
 The speaker and microphone indicators have separate compact mixers:
