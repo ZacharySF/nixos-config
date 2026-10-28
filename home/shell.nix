@@ -17,6 +17,9 @@
       update = "nix flake update --flake ~/nixos-config";
       # Format all nix files.
       nixfmt = "nix fmt ~/nixos-config";
+      # firstmate crew orchestrator (github:kunchenguid/firstmate), cloned into
+      # the omp root; omp auto-loads its .omp/extensions when started there.
+      firstmate = "cd ~/.omp/firstmate && FM_OMP_HARNESS=omp omp";
 
       ".." = "cd ..";
       "..." = "cd ../..";
