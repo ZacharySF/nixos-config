@@ -275,6 +275,8 @@ spawn-at-startup "sh" "-c" "IRONBAR_CSS=~/.config/ironbar/style.css ironbar"
 spawn-at-startup "/home/xelo/.local/bin/ironbar-focused-app"
 spawn-at-startup "mako"
 spawn-at-startup "blueman-applet"
+// Voice dictation into any focused window (modules/system/wispr-flow.nix).
+spawn-at-startup "wispr-flow" "--hidden"
 layer-rule {
 	match namespace="^swaybg$"
 	place-within-backdrop true

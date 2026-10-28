@@ -13,5 +13,6 @@
     ./packages.nix
     ./touchpad.nix
     ./skwd-wall.nix
+    ./wispr-flow.nix
   ];
 }

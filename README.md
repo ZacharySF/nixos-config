@@ -64,6 +64,9 @@ modules/system/               everything that needs root / affects all users
   desktop.nix                 Niri compositor + greetd login + portals + fonts
   users.nix                   user accounts, docker, nix-ld
   packages.nix                the short list of system-wide packages
+  wispr-flow.nix              Wispr Flow dictation + its uinput/input udev rule
+
+pkgs/wispr-flow/              Wispr Flow package (unofficial Linux port's AppImage)
 
 home/                         everything inside /home/xelo (home-manager)
   default.nix                 imports all of the below
