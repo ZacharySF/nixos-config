@@ -11,8 +11,11 @@ in
   # The helper injects text through a /dev/uinput virtual keyboard.
   boot.kernelModules = [ "uinput" ];
 
-  # Grants the logged-in user /dev/uinput write + /dev/input/event* read (the
-  # global push-to-talk hotkey). Note: any process in your session can then
-  # read raw keyboard events — the price of a global hotkey on Wayland.
+  # Rule: /dev/uinput write (typing) + /dev/input/event* read (push-to-talk
+  # hotkey), as group `input` 0660. Its logind `uaccess` ACL never lands here:
+  # uinput is a static node with no udev event, so membership is what works.
+  # Any of your processes can then read raw keyboard events — the price of a
+  # global hotkey on Wayland.
   services.udev.packages = [ wispr-flow ];
+  users.users.xelo.extraGroups = [ "input" ];
 }
