@@ -114,6 +114,10 @@ The session pieces are separate programs: **ironbar** (bar), **fuzzel**
 networking is NetworkManager, Bluetooth is on. Docker is enabled. `nix-ld` lets
 non-Nix binaries run. Firewall is default-deny.
 
+New interactive Bash shells show Fastfetch with the configured image.
+`home/shell.nix` selects `kitty-direct` graphics when `TERM_PROGRAM=tern`;
+other terminals retain the iTerm image protocol in `home/fastfetch.jsonc`.
+
 Full Niri keybindings: press `Mod+Shift+/` in the session, or read
 `home/niri/config.kdl` (it is mostly the upstream default with a few tweaks —
 startup apps, keyboard repeat rate, `Mod+T` → Firefox, `Mod+B` → bluetooth menu).

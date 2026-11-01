@@ -37,6 +37,9 @@
       # system summary on new interactive shells
       if [[ $- == *i* ]] && command -v fastfetch >/dev/null; then
         (
+          # Tern renders Kitty graphics, not the default iTerm image protocol.
+          logo_args=()
+          [[ ''${TERM_PROGRAM-} == tern ]] && logo_args=(--logo-type kitty-direct)
           # Niri/WezTerm can finish sizing after fastfetch has sent its image.
           # Require 150 ms of stable cell AND pixel dimensions, bounded to 1 s.
           terminal_attached=0
@@ -75,7 +78,7 @@
               logo_width=$((columns > 34 ? columns - 34 : 1))
             fi
             set -o pipefail
-            fastfetch --config ~/.config/fastfetch/config.jsonc --pipe false --logo-width "$logo_width" |
+            fastfetch --config ~/.config/fastfetch/config.jsonc --pipe false --logo-width "$logo_width" "''${logo_args[@]}" |
               # Read pixel dimensions directly, without a WezTerm GUI round trip.
               # One streaming filter preserves the half-row gap and aligned colors.
               ${pkgs.perl}/bin/perl -e '
