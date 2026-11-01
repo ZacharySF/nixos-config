@@ -10,8 +10,8 @@
 #   hook                     reload command, installed at a stable path under
 #                            ~/.config/skwd-theme/hooks/ so config.json never has
 #                            to change when store paths do.
-# Integrations are only ever ADDED to config.json (matched by name); existing
-# entries, wallpaper profiles and anything else the GUI wrote are left alone.
+# Integrations are added by name, preserving existing entries and GUI settings,
+# except the managed Quickshell entry and the retired Ironbar integration.
 { config, lib, pkgs, ... }:
 let
   home = config.home.homeDirectory;
@@ -28,18 +28,23 @@ let
     surface_variant = "#1d1f30";
     on_surface_variant = "#a6adc8";
     surface_container = "#1d1f30";
+    surface_container_low = "#191c30";
     surface_container_high = "#313244";
+    surface_container_highest = "#41435a";
     primary = "#8caff0";
     on_primary = "#181825";
     primary_container = "#303c60";
     on_primary_container = "#e0e5ff";
     secondary = "#91a2ff";
     secondary_container = "#2a3150";
+    on_secondary_container = "#e0e5ff";
     tertiary = "#c4a7e7";
     tertiary_container = "#3b3660";
     outline = "#585b70";
     outline_variant = "#383b50";
     error = "#f7768e";
+    on_error = "#181825";
+    shadow = "#000000";
     ansi_red = "#ff6e9c";
     ansi_green = "#7ee8a0";
     ansi_yellow = "#f1d576";
@@ -80,21 +85,6 @@ let
     };
 
   hooks = {
-    # Ironbar hot-reloads a sheet registered with `style load-css`, but every
-    # call adds another CSS provider plus an inotify instance (a per-user limit
-    # shared by all apps). Register it once per Ironbar process; its own
-    # watcher picks up every later render. The @import in style.css covers
-    # startup colours.
-    ironbar = hook "ironbar" [ pkgs.procps pkgs.coreutils pkgs.ironbar ] ''
-      uid=$(id -u)
-      pid=$(pgrep -n -u "$uid" -x 'ironbar|\.ironbar-wrappe') || exit 0
-      stat=$(cat "/proc/$pid/stat") || exit 0
-      instance="$pid $(printf '%s\n' "''${stat##*) }" | cut -d' ' -f20)"
-      marker="''${XDG_RUNTIME_DIR:-/run/user/$uid}/skwd-theme-ironbar"
-      [ "$(cat "$marker" 2>/dev/null)" = "$instance" ] && exit 0
-      ironbar style load-css "${home}/${stateRel}/ironbar.css" >/dev/null
-      printf '%s\n' "$instance" > "$marker"
-    '';
     mako = hook "mako" [ pkgs.mako ] "makoctl reload || true";
     btop = hook "btop" [ pkgs.procps pkgs.coreutils ] ''pkill -USR2 -u "$(id -u)" -x btop || true'';
     # GTK4/libadwaita apps follow this key; GTK3 apps keep gtk.theme.
@@ -116,7 +106,7 @@ let
 
   # output: relative to $HOME. livePreview: re-render while browsing the picker.
   apps = [
-    { name = "ironbar"; template = "ironbar-theme.css"; output = "${stateRel}/ironbar.css"; livePreview = true; }
+    { name = "quickshell"; template = "quickshell-theme.json"; output = "${stateRel}/quickshell.json"; livePreview = true; }
     { name = "niri"; template = "niri-theme.kdl"; output = "${stateRel}/niri.kdl"; livePreview = true; }
     { name = "wezterm"; template = "wezterm-theme.lua"; output = "${stateRel}/wezterm.lua"; livePreview = true; }
     { name = "btop"; template = "btop-theme.theme"; output = ".config/btop/themes/skwd-managed.theme"; livePreview = true; }
@@ -169,20 +159,28 @@ in
     elif [ ! -e "$skwdCfg" ]; then
       run install -Dm644 ${initialJson} "$skwdCfg"
       skwdChanged=1
-    elif ! skwdMissing=$(${jq} -c --slurpfile want ${wantedJson} '
+    elif ! skwdIntegrations=$(${jq} -r --slurpfile want ${wantedJson} '
         if type != "object" then error("not an object") else . end
         | (.integrations // []) as $have
         | if ($have | type) != "array" then error("integrations is not an array") else . end
-        | [$have[] | (.name? | strings) // "" | ascii_downcase] as $names
-        | [$want[0][] | select((.name | ascii_downcase) as $n | any($names[]; . == $n) | not)]
+        | [$have[] | select(
+            ((.name? | strings) // "" | ascii_downcase) as $name
+            | $name != "ironbar" and $name != "quickshell"
+          )] as $keep
+        | [$keep[] | (.name? | strings) // "" | ascii_downcase] as $names
+        | ($keep + [$want[0][] | select(
+            (.name | ascii_downcase) as $name
+            | any($names[]; . == $name) | not
+          )]) as $next
+        | if .integrations == $next then "" else ($next | tojson) end
       ' "$skwdCfg" 2>/dev/null); then
       warnEcho "skwd-theme: $skwdCfg is not valid skwd JSON; leaving it alone."
-    elif [ "$skwdMissing" != "[]" ]; then
+    elif [ -n "$skwdIntegrations" ]; then
       if [[ -v DRY_RUN ]]; then
-        echo "Would add skwd-wall integrations: $skwdMissing"
+        echo "Would update skwd-wall integrations: $skwdIntegrations"
       else
         skwdTmp=$(mktemp "$skwdCfg.XXXXXX")
-        ${jq} --argjson add "$skwdMissing" '.integrations = ((.integrations // []) + $add)' \
+        ${jq} --argjson integrations "$skwdIntegrations" '.integrations = $integrations' \
           "$skwdCfg" > "$skwdTmp"
         chmod --reference="$skwdCfg" "$skwdTmp"
         mv "$skwdTmp" "$skwdCfg"
