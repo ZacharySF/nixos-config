@@ -215,7 +215,15 @@ Host-specific upstream scratchpad, tablet, display-layout and power-profile
 controls are omitted because their helper services are not installed here.
 
 Edit `home/quickshell/` and rebuild. Home Manager restarts the bar when QML
-changes; palette and geometry changes are watched live. Restart manually with:
+changes; palette and geometry changes are watched live.
+
+For changes to survive reboot, first merge the working branch into
+`~/nixos-config`, then run the `sudo nixos-rebuild switch` command at the top
+of this document. Running a Home Manager generation's `activate` script alone
+only changes the current user environment: booting the saved NixOS generation
+re-applies its own Home Manager configuration and can restore the previous bar.
+
+Restart manually with:
 
 ```sh
 systemctl --user restart quickshell-bar.service
