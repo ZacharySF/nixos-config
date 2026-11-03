@@ -77,8 +77,8 @@ home/                         everything inside /home/xelo (home-manager)
     default.nix               installs config.kdl + Niri helper tools
     config.kdl                the actual Niri config (raw KDL, hand-editable)
   foot.nix                    terminal emulator (colours in Nix)
-  ironbar.nix                 status bar (raw config.json/style.css + battery script)
-  ironbar/                    those raw files
+  quickshell.nix              Quickshell bar service and 30-pixel height
+  quickshell/                 vendored nunera/quickshell-bar QML
   skwd-theme/                 app colours follow the skwd-wall wallpaper palette
     default.nix               integrations, reload hooks, fallbacks, config.json merge
     templates/                colour-only templates (copied once into skwd-wall)
@@ -99,7 +99,7 @@ flake.nix
      │                                   audio, desktop, users, packages
      └─ (home-manager module from flake.nix)
          └─ home/default.nix        ──► shell, git, niri, desktop, foot,
-                                          ironbar, btop, editors, dev, spicetify
+                                          quickshell, btop, editors, dev, spicetify
 ```
 
 ---
@@ -108,7 +108,7 @@ flake.nix
 
 Intel laptop. Boots via systemd-boot, latest kernel. `greetd` uses `tuigreet`
 to prompt for credentials and start a **Niri** (scrollable-tiling Wayland) session.
-The session pieces are separate programs: **ironbar** (bar), **fuzzel**
+The session pieces are separate programs: **Quickshell** (bar), **fuzzel**
 (launcher, `Mod+Tab`), **mako** (notifications), **hyprlock** (`Super+Alt+L`),
 **WezTerm** (terminal, `Mod+Return`), **swaybg** (wallpaper). Audio is PipeWire,
 networking is NetworkManager, Bluetooth is on. Docker is enabled. `nix-ld` lets
@@ -165,37 +165,66 @@ with the flake's pinned nixpkgs and install the resulting store path with
 After a normal system rebuild includes the same repair, remove that temporary
 copy with `nix profile remove wispr-flow` so future system updates take effect.
 
-### Audio and Bluetooth popups
+### Tern terminal and transparency
 
-The speaker and microphone indicators have separate compact mixers:
-
-- **Click** the speaker for the default output and per-application volume/mute controls.
-- **Click** the microphone for the default input and recording-application controls.
-- **Middle-click** either indicator to toggle that device's mute without opening a menu.
-- **Scroll** either indicator to adjust its volume in 2% steps, capped at 100%.
-- **Right-click** for Pavucontrol, including per-application routing and device settings.
-- Click the same indicator again, or click outside, to dismiss a popup.
-
-Bluetooth uses the same flat, slightly cooler Catppuccin Mocha palette as audio.
-Both panels are 96% opaque with compact regular-weight text. Audio sliders show
-a small round handle only on hover, keyboard focus, or dragging. Bar hover help
-boxes are disabled; Bluetooth device status and battery information remain in
-its popup. The Bluetooth list scrolls after 260 pixels.
-
-Edit `home/ironbar/config.json` and `home/ironbar/style.css`, then rebuild as above.
-To make the running bar pick up the installed files without logging out:
+`pkgs/tern/default.nix` packages the supplied **0.9.8** Linux x86_64 archive,
+patches its native library paths, and supplies `gdbus` for desktop portals.
+Import the closed-beta download before building:
 
 ```sh
-ironbar reload
-ironbar style load-css ~/.config/ironbar/style.css
+nix-store --add-fixed sha256 ~/downloads/Tern-0.9.8-linux-x86_64.tar.gz
 ```
 
-The center label (focused app) is filled by `~/.local/bin/ironbar-focused-app`,
-which Niri starts at login. After changing `home/ironbar/focused-app.py` and
-rebuilding, restart it:
+The launcher defaults **only Tern** to `WGPU_BACKEND=vulkan`. On this Intel
+laptop its default OpenGL renderer reports “no transparent swapchain” and
+ignores background transparency. An explicit `WGPU_BACKEND` still overrides
+the package default. The Niri rule for `so.stencil.tern` blurs behind the
+window, removes the opaque focus-ring backing, and uses 12px rounded corners.
+It does not lower whole-window opacity, so text stays opaque.
+
+Tern keeps editable appearance preferences in `~/.config/tern/settings.json`.
+The applied look uses `dark-catppuccin`, the `Float` interface layout, Clear
+material, opacity `50`, JetBrainsMono Nerd Font at `14`, line-height adjustment
+`12%`, padding `18` horizontally and `14` vertically, and pane headers only
+when split. The original preferences are backed up beside it as
+`settings.before-appearance.json`.
+
+For an app-only update, build this package with the pinned nixpkgs and install
+its store path with `nix profile add`; existing launchers should use the packaged
+`tern`, not the original Downloads binary. Upgrades are managed through Nix
+because the package store is read-only. Appearance settings remain user-editable.
+
+### Quickshell bar
+
+- Click the speaker for output/input devices and application mixers.
+- Middle-click or right-click the speaker to toggle output mute.
+- Scroll the speaker to change output volume in 5% steps, capped at 100%.
+- Click network status for Wi-Fi and Bluetooth controls.
+- Click the battery for charge estimates, health and charge history.
+- The application dot opens Fuzzel.
+- The GitHub icon replaces the workspace strip and opens https://github.com/zacharysf.
+- Bluetooth status and the Blueman tray button are hidden; Bluetooth controls remain in the network popup.
+
+The bar is vendored from [nunera/quickshell-bar](https://github.com/nunera/quickshell-bar)
+at revision `a6787668c2deb891e59a7eea0140aa7dc8f7d1c4`.
+`home/quickshell.nix` sets its height to 25 logical pixels (upstream: 34),
+with uniform 16-pixel icons, 12-pixel text and a 6-pixel screen-edge gap;
+the battery percentage stays visible beside its icon. No Steam launcher or
+package is added. The launcher opens Fuzzel; mako continues handling notifications.
+Host-specific upstream scratchpad, tablet, display-layout and power-profile
+controls are omitted because their helper services are not installed here.
+
+Edit `home/quickshell/` and rebuild. Home Manager restarts the bar when QML
+changes; palette and geometry changes are watched live. Restart manually with:
 
 ```sh
-pkill -f ironbar-focused-app; niri msg action spawn -- ~/.local/bin/ironbar-focused-app
+systemctl --user restart quickshell-bar.service
+```
+
+Run the battery label regression with:
+
+```sh
+BAR_NOTIFICATIONS=0 qs -p home/quickshell/battery-check.qml
 ```
 
 ### Wallpaper-driven colours (skwd-wall)
@@ -203,18 +232,17 @@ pkill -f ironbar-focused-app; niri msg action spawn -- ~/.local/bin/ironbar-focu
 Each time skwd-wall applies a wallpaper it renders the templates registered in
 `~/.config/skwd-wall-v2/config.json` → `integrations` into
 `~/.local/state/skwd-theme/` (btop: `~/.config/btop/themes/skwd-managed.theme`).
-The Nix-managed configs of Ironbar, Niri, WezTerm, mako, fuzzel, foot and btop
+The Nix-managed configs of Quickshell, Niri, WezTerm, mako, fuzzel, foot and btop
 include those files; reload hooks live in `~/.config/skwd-theme/hooks/`.
 
-- Live: Ironbar, Niri focus ring, WezTerm, btop, mako. Next open: fuzzel, foot.
+- Live: Quickshell, Niri focus ring, WezTerm, btop, mako. Next open: fuzzel, foot.
 - `gtk-mode` sets GTK4/libadwaita light/dark from the palette; GTK3 stays Adwaita-dark.
 - Templates are copied into `~/.config/skwd-wall-v2/matugen/templates/` only if
   missing, so edits there survive rebuilds; delete one to get the repo version back.
-- Activation only *adds* integrations that are missing by name; edit or delete
-  them freely in the skwd-wall GUI. Saved wallpaper profiles override generated colours.
+- Activation adds missing integrations, replaces the managed Quickshell entry,
+  and retires Ironbar. Other integrations and saved wallpaper profiles are preserved.
 - Re-render without changing wallpaper: `skwd-helm retheme`.
-- After restarting Ironbar by hand its colours stay correct; live recolouring resumes on
-  the next wallpaper change (the hook re-registers the sheet once per Ironbar process).
+- Quickshell watches its palette JSON and applies changes without a reload hook.
 
 ### Transparent Firefox
 
@@ -358,7 +386,7 @@ back.
 
 ## Saved desktop files
 
-`home/` contains the current Home Manager configuration, including Niri, Ironbar,
+`home/` contains the current Home Manager configuration, including Niri, Quickshell,
 Foot, shell, GTK, Fastfetch, and Zed settings. `home/wallpaper/wallpaper.jpg` is
 installed at both original wallpaper paths. The root `configuration.nix` and
 `.dotfiles/` and `legacy/home/` preserve the older configuration for reference; use the root flake

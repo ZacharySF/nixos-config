@@ -268,11 +268,9 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// This line starts waybar, a commonly used bar for Wayland compositors.
+// Wallpaper and the systemd-managed Quickshell bar.
 spawn-at-startup "swaybg" "-i" "/home/xelo/pictures/wallpaper.jpg" "-m" "fill"
-spawn-at-startup "sh" "-c" "IRONBAR_CSS=~/.config/ironbar/style.css ironbar"
-// Keeps the bar's focused-app label current on every monitor (home/ironbar/focused-app.py).
-spawn-at-startup "/home/xelo/.local/bin/ironbar-focused-app"
+spawn-at-startup "systemctl" "--user" "start" "quickshell-bar.service"
 spawn-at-startup "mako"
 spawn-at-startup "blueman-applet"
 // Voice dictation into any focused window (modules/system/wispr-flow.nix).
@@ -367,6 +365,17 @@ window-rule {
 window-rule {
     geometry-corner-radius 8
     clip-to-geometry true
+}
+
+// Tern supplies background alpha; keep text opaque and blur only behind it.
+window-rule {
+    match app-id=r#"^so\.stencil\.tern$"#
+    draw-border-with-background false
+    geometry-corner-radius 12
+    clip-to-geometry true
+    background-effect {
+        blur true
+    }
 }
 
 // Wispr Flow's status pill: a transparent 512x614 window with the pill painted

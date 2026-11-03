@@ -147,6 +147,7 @@
     nautilus       # file manager
     pavucontrol    # audio mixer
     wezterm       # terminal emulator
+    (callPackage ../pkgs/tern { }) # Tern with native libraries and transparent Vulkan rendering
     wl-clipboard
     libreoffice    # opens .docx/.doc/.odt/.xlsx/.pptx and more
   ];

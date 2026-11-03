@@ -11,7 +11,7 @@
     ./desktop.nix    # GTK theme, cursor, xdg user dirs
     ./foot.nix       # terminal emulator
     ./wezterm.nix    # WezTerm appearance
-    ./ironbar.nix    # status bar
+    ./quickshell.nix # status bar
     ./skwd-theme     # app colours follow skwd-wall's wallpaper palette
     ./btop.nix       # system monitor config
     ./editors.nix    # zed / vscode / obsidian
