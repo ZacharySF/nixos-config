@@ -90,7 +90,7 @@
     # Source Serif/Sans (+ fontaxes, mweights) are the new templates' type pairing.
     (texliveSmall.withPackages (ps: with ps; [
       preprint marvosym titlesec enumitem fancyhdr
-      sourceserifpro sourcesanspro fontaxes mweights
+      sourceserifpro sourcesanspro fontaxes mweights ly1
     ]))
   ];
 }
