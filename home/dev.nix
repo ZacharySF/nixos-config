@@ -79,5 +79,16 @@
     # RISC-V bare-metal GCC is a large build — uncomment when you actually
     # need cross-compilation:
     # pkgsCross.riscv64-embedded.buildPackages.gcc
+
+    # ---------------------------------------------------------------
+    # rika! Resume Workshop compilers (found on PATH by kitty-workshop)
+    # ---------------------------------------------------------------
+    bubblewrap        # the workshop compiles every resume inside a bwrap sandbox
+    typst             # Typst resumes
+    # pdfLaTeX/LuaLaTeX plus what Jake's Resume template needs
+    # (preprint = fullpage.sty).
+    (texlive.combine {
+      inherit (texlive) scheme-small preprint marvosym titlesec enumitem fancyhdr;
+    })
   ];
 }
