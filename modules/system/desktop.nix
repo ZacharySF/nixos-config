@@ -76,5 +76,7 @@
     nerd-fonts.symbols-only   # icon glyphs to patch into other fonts
     inconsolata               # foot terminal font
     cinzel                    # dark-fantasy display serif (hyprlock lock screen)
+    source-serif              # rika! resume templates (HTML): headings
+    source-sans               # rika! resume templates (HTML): body
   ];
 }
