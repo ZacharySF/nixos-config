@@ -87,8 +87,10 @@
     typst             # Typst resumes
     # pdfLaTeX/LuaLaTeX plus what Jake's Resume template needs
     # (preprint = fullpage.sty).
-    (texlive.combine {
-      inherit (texlive) scheme-small preprint marvosym titlesec enumitem fancyhdr;
-    })
+    # Source Serif/Sans (+ fontaxes, mweights) are the new templates' type pairing.
+    (texliveSmall.withPackages (ps: with ps; [
+      preprint marvosym titlesec enumitem fancyhdr
+      sourceserifpro sourcesanspro fontaxes mweights
+    ]))
   ];
 }
